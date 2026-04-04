@@ -78,6 +78,7 @@ function render() {
       <h3>${habit.name}</h3>
       <p>Streak: 🔥 ${habit.streak}</p>
       <button onclick="completeHabit(${index})">Complete</button>
+      <button onclick="deleteHabit(${index})" style="background:red;">Delete</button>
     `;
     list.appendChild(div);
   });
@@ -103,6 +104,12 @@ function completeHabit(index) {
     alert("🔥 Level " + data.level + " reached!");
   }
 
+  save();
+  render();
+}
+
+function deleteHabit(index) {
+  data.habits.splice(index, 1);
   save();
   render();
 }
