@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Habit Game</title>
+  <title>Habit Builder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -34,10 +34,13 @@
     }
   </style>
 </head>
+
 <body>
 
 <h1>Habit Builder 🎯</h1>
-  <div id="stats"></div>
+
+<div id="stats"></div>
+
 <div style="background:#ddd; border-radius:10px; overflow:hidden; margin-top:10px;">
   <div id="xpBar" style="height:10px; background:black; width:0%"></div>
 </div>
@@ -48,17 +51,27 @@
 <div id="habitList"></div>
 
 <script>
-let habits = JSON.parse(localStorage.getItem("habits")) || [];
+let data = JSON.parse(localStorage.getItem("data")) || {
+  habits: [],
+  xp: 0,
+  level: 1
+};
 
 function save() {
-  localStorage.setItem("habits", JSON.stringify(habits));
+  localStorage.setItem("data", JSON.stringify(data));
 }
 
 function render() {
   let list = document.getElementById("habitList");
   list.innerHTML = "";
 
-  habits.forEach((habit, index) => {
+  document.getElementById("stats").innerHTML =
+    "Level: " + data.level + " | XP: " + data.xp + "/100";
+
+  let percent = (data.xp / 100) * 100;
+  document.getElementById("xpBar").style.width = percent + "%";
+
+  data.habits.forEach((habit, index) => {
     let div = document.createElement("div");
     div.className = "card";
     div.innerHTML = `
@@ -74,14 +87,22 @@ function addHabit() {
   let input = document.getElementById("habitInput");
   if (input.value === "") return;
 
-  habits.push({ name: input.value, streak: 0 });
+  data.habits.push({ name: input.value, streak: 0 });
   input.value = "";
   save();
   render();
 }
 
 function completeHabit(index) {
-  habits[index].streak++;
+  data.habits[index].streak++;
+  data.xp += 10;
+
+  if (data.xp >= 100) {
+    data.level++;
+    data.xp = 0;
+    alert("🔥 Level " + data.level + " reached!");
+  }
+
   save();
   render();
 }
