@@ -2,8 +2,88 @@
 <html>
 <head>
   <title>Habit Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      padding: 15px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+    button {
+      padding: 10px;
+      margin-top: 5px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      background: black;
+      color: white;
+    }
+    input {
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Habit Builder Working ✅</h1>
+
+<h1>Habit Builder 🎯</h1>
+
+<input id="habitInput" placeholder="Enter habit">
+<button onclick="addHabit()">Add Habit</button>
+
+<div id="habitList"></div>
+
+<script>
+let habits = JSON.parse(localStorage.getItem("habits")) || [];
+
+function save() {
+  localStorage.setItem("habits", JSON.stringify(habits));
+}
+
+function render() {
+  let list = document.getElementById("habitList");
+  list.innerHTML = "";
+
+  habits.forEach((habit, index) => {
+    let div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <h3>${habit.name}</h3>
+      <p>Streak: 🔥 ${habit.streak}</p>
+      <button onclick="completeHabit(${index})">Complete</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addHabit() {
+  let input = document.getElementById("habitInput");
+  if (input.value === "") return;
+
+  habits.push({ name: input.value, streak: 0 });
+  input.value = "";
+  save();
+  render();
+}
+
+function completeHabit(index) {
+  habits[index].streak++;
+  save();
+  render();
+}
+
+render();
+</script>
+
 </body>
 </html>
