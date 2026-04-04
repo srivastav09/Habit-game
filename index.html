@@ -3,34 +3,67 @@
 <head>
   <title>Habit Builder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       background: #f5f5f5;
       padding: 15px;
     }
+
     h1 {
       text-align: center;
+      margin-bottom: 5px;
     }
+
+    #stats {
+      text-align: center;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .bar-container {
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    #xpBar {
+      height: 10px;
+      width: 0%;
+      background: linear-gradient(to right, #4caf50, #8bc34a);
+    }
+
+    input {
+      padding: 12px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      background: black;
+      color: white;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
     .card {
       background: white;
       padding: 15px;
       margin-top: 10px;
-      border-radius: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    button {
-      padding: 10px;
-      margin-top: 5px;
-      width: 100%;
-      border: none;
-      border-radius: 5px;
-      background: black;
-      color: white;
-    }
-    input {
-      padding: 10px;
-      width: 100%;
-      margin-top: 10px;
+
+    .delete-btn {
+      background: red;
     }
   </style>
 </head>
@@ -41,14 +74,16 @@
 
 <div id="stats"></div>
 
-<div style="background:#ddd; border-radius:10px; overflow:hidden; margin-top:10px;">
-  <div id="xpBar" style="height:10px; background:black; width:0%"></div>
+<div class="bar-container">
+  <div id="xpBar"></div>
 </div>
 
 <input id="habitInput" placeholder="Enter habit">
 <button onclick="addHabit()">Add Habit</button>
 
 <div id="habitList"></div>
+
+<button onclick="resetAll()" style="background:gray;">Reset All</button>
 
 <script>
 let data = JSON.parse(localStorage.getItem("data")) || {
@@ -74,21 +109,28 @@ function render() {
   data.habits.forEach((habit, index) => {
     let div = document.createElement("div");
     div.className = "card";
+
     div.innerHTML = `
       <h3>${habit.name}</h3>
       <p>Streak: 🔥 ${habit.streak}</p>
       <button onclick="completeHabit(${index})">Complete</button>
-      <button onclick="deleteHabit(${index})" style="background:red;">Delete</button>
+      <button class="delete-btn" onclick="deleteHabit(${index})">Delete</button>
     `;
+
     list.appendChild(div);
   });
 }
 
 function addHabit() {
   let input = document.getElementById("habitInput");
-  if (input.value === "") return;
 
-  data.habits.push({ name: input.value, streak: 0 });
+  if (input.value.trim() === "") return;
+
+  data.habits.push({
+    name: input.value,
+    streak: 0
+  });
+
   input.value = "";
   save();
   render();
@@ -112,6 +154,11 @@ function deleteHabit(index) {
   data.habits.splice(index, 1);
   save();
   render();
+}
+
+function resetAll() {
+  localStorage.clear();
+  location.reload();
 }
 
 render();
