@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HabitQuest</title>
   <style>
+    html { color-scheme: dark; }
     :root {
       --bg: #07111f;
       --panel: rgba(12, 22, 41, 0.82);
@@ -872,6 +873,168 @@
       .ring { width: min(78vw, 250px); }
       .modal-grid, .swatch-row, .toggle-grid { grid-template-columns: 1fr; }
     }
+
+    html.theme-light {
+      color-scheme: light;
+    }
+
+    html.theme-light {
+      --bg: #f4f7fd;
+      --panel: rgba(255, 255, 255, 0.92);
+      --panel-strong: #e8eef9;
+      --line: rgba(15, 23, 42, 0.1);
+      --text: #0f172a;
+      --muted: #475569;
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light body {
+      background:
+        radial-gradient(circle at top left, rgba(45, 226, 230, 0.12), transparent 32%),
+        radial-gradient(circle at top right, rgba(141, 92, 255, 0.1), transparent 30%),
+        linear-gradient(165deg, #f8fafc, #eef2ff 55%, #f1f5f9);
+    }
+
+    html.theme-light .topbar {
+      background: rgba(255, 255, 255, 0.82);
+      border-bottom-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .toast {
+      background: rgba(255, 255, 255, 0.96);
+      border-color: rgba(15, 23, 42, 0.1);
+      color: var(--text);
+    }
+
+    html.theme-light .app-footer {
+      background: rgba(248, 250, 252, 0.9);
+      border-top-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .icon-btn,
+    html.theme-light .chip,
+    html.theme-light .tab,
+    html.theme-light .ghost,
+    html.theme-light .task button {
+      border-color: rgba(15, 23, 42, 0.1);
+      background: rgba(255, 255, 255, 0.65);
+    }
+
+    html.theme-light .nav-item {
+      border-color: rgba(15, 23, 42, 0.08);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    html.theme-light .nav-item.active {
+      background: linear-gradient(135deg, rgba(45, 226, 230, 0.2), rgba(141, 92, 255, 0.18));
+      border-color: rgba(141, 92, 255, 0.35);
+    }
+
+    html.theme-light .nav-icon {
+      background: rgba(15, 23, 42, 0.06);
+    }
+
+    html.theme-light .sidebar-footer {
+      background: linear-gradient(145deg, rgba(45, 226, 230, 0.14), rgba(255, 107, 107, 0.1));
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .task {
+      border-color: rgba(15, 23, 42, 0.08);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    html.theme-light .task.completed {
+      background: rgba(183, 243, 76, 0.12);
+      border-color: rgba(34, 197, 94, 0.25);
+    }
+
+    html.theme-light .check {
+      border-color: rgba(15, 23, 42, 0.2);
+    }
+
+    html.theme-light .task-tools input {
+      border-color: rgba(15, 23, 42, 0.12);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--text);
+    }
+
+    html.theme-light .task-tools input::placeholder { color: #64748b; }
+
+    html.theme-light .bar {
+      background: rgba(15, 23, 42, 0.06);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .chart {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.02));
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .leader-row {
+      background: rgba(255, 255, 255, 0.6);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .leader-row.top3 {
+      border-color: rgba(255, 200, 87, 0.35);
+    }
+
+    html.theme-light .rank {
+      background: rgba(15, 23, 42, 0.06);
+    }
+
+    html.theme-light .ring .timebox {
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.04), rgba(255, 255, 255, 0.6));
+      border-color: rgba(15, 23, 42, 0.1);
+    }
+
+    html.theme-light .focus-note {
+      color: #0c4a4e;
+      background: rgba(45, 226, 230, 0.12);
+      border-color: rgba(45, 226, 230, 0.28);
+    }
+
+    html.theme-light .quote {
+      border-color: rgba(15, 23, 42, 0.08);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    html.theme-light .avatar-stage {
+      background: radial-gradient(circle at top, rgba(141, 92, 255, 0.12), rgba(45, 226, 230, 0.06));
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .overlay {
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    html.theme-light .modal {
+      background: rgba(255, 255, 255, 0.98);
+      border-color: rgba(15, 23, 42, 0.1);
+    }
+
+    html.theme-light .field {
+      background: rgba(248, 250, 252, 0.9);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .field input,
+    html.theme-light .field textarea,
+    html.theme-light .field select {
+      border-color: rgba(15, 23, 42, 0.12);
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text);
+    }
+
+    html.theme-light .toggle {
+      background: rgba(248, 250, 252, 0.9);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    html.theme-light .cta {
+      color: #06111f;
+    }
   </style>
 </head>
 <body>
@@ -882,7 +1045,7 @@
       <div class="modal-head">
         <div>
           <h2 id="settingsTitle">Customize HabitQuest</h2>
-          <p>Personalize theme, copy, navigation, XP rules, insights data, effects, visibility, quotes, timer presets, and starter tasks.</p>
+          <p>Personalize theme, copy, navigation, XP rules, optional insights CSV backup, effects, visibility, quotes, timer presets, and starter tasks.</p>
         </div>
         <button class="icon-btn" id="closeSettingsBtn" aria-label="Close settings">✕</button>
       </div>
@@ -986,6 +1149,7 @@
           <label>Effects &amp; behavior</label>
           <div class="toggle-grid">
             <label class="toggle"><input type="checkbox" id="confettiEnabled" name="confettiEnabled" /> Confetti celebrations</label>
+            <label class="toggle"><input type="checkbox" id="timerRockMusic" name="timerRockMusic" /> Rock music when focus timer ends</label>
             <label class="toggle"><input type="checkbox" id="quoteRotationEnabled" name="quoteRotationEnabled" /> Rotate quotes</label>
           </div>
           <div class="modal-grid" style="margin-top:12px">
@@ -997,16 +1161,17 @@
         </div>
 
         <div class="field">
-          <label for="insightsHoursInput">Insights — study hours (7 numbers, commas)</label>
+          <label for="insightsHoursInput">Insights CSV — study hours (optional backup)</label>
           <input id="insightsHoursInput" name="insightsHours" type="text" placeholder="2.5,3.8,..." />
+          <small class="helper" style="display:block;margin-top:6px">The live chart uses your real focus minutes, streak, and XP from completed tasks and timer sessions (last 7 days). These CSV fields are not used for the chart.</small>
         </div>
         <div class="modal-grid">
           <div class="field">
-            <label for="insightsStreaksInput">Insights — streaks (7 numbers)</label>
+            <label for="insightsStreaksInput">Insights CSV — streaks (optional backup)</label>
             <input id="insightsStreaksInput" name="insightsStreaks" type="text" />
           </div>
           <div class="field">
-            <label for="insightsXpInput">Insights — XP series (7 numbers)</label>
+            <label for="insightsXpInput">Insights CSV — XP series (optional backup)</label>
             <input id="insightsXpInput" name="insightsXp" type="text" />
           </div>
         </div>
@@ -1102,6 +1267,7 @@
           <div style="display:flex;align-items:center;gap:10px">
             <div class="avatar" id="miniAvatar">?</div>
             <button type="button" class="ghost" id="editProfileBtn" style="padding:8px 12px;font-size:0.8rem" title="Edit your details">Profile</button>
+            <button type="button" class="icon-btn" id="themeToggleBtn" aria-label="Toggle light or dark theme" title="Theme">◐</button>
             <button type="button" class="icon-btn" id="settingsBtn" aria-label="Settings">⚙</button>
           </div>
         </div>
@@ -1280,6 +1446,28 @@
   <script>
     const STORAGE_KEY = "habitquest-dashboard-v2";
     const LEGACY_STORAGE_KEY = "habitquest-dashboard-v1";
+    const THEME_KEY = "habitquest-theme";
+
+    function applySavedTheme() {
+      try {
+        const t = localStorage.getItem(THEME_KEY);
+        const light = t === "light";
+        document.documentElement.classList.toggle("theme-light", light);
+        const btn = document.getElementById("themeToggleBtn");
+        if (btn) btn.textContent = light ? "☀" : "◐";
+        if (btn) btn.setAttribute("title", light ? "Switch to dark theme" : "Switch to light theme");
+      } catch (_) {}
+    }
+
+    function toggleTheme() {
+      try {
+        const next = document.documentElement.classList.contains("theme-light") ? "dark" : "light";
+        localStorage.setItem(THEME_KEY, next === "light" ? "light" : "dark");
+      } catch (_) {}
+      applySavedTheme();
+    }
+
+    applySavedTheme();
     const quotes = [
       "Small wins compound into big results. Finish the next task.",
       "Focus for 25 minutes now, enjoy future-you later.",
@@ -1350,6 +1538,8 @@
       chartNoteHours: "Weekly study hours are trending upward.",
       chartNoteStreaks: "Streak consistency is becoming stronger.",
       chartNoteXp: "XP growth is compounding with each session.",
+      chartNoteNoProfile: "Save your profile to track study hours, streaks, and XP over the last 7 days.",
+      chartNoteEmptyProgress: "Complete tasks or finish a focus session to fill this chart.",
       chartAxisHours: "M,T,W,T,F,S,S",
       chartAxisStreaks: "1,2,3,4,5,6,7",
       chartAxisXp: "10,20,30,40,50,60,70",
@@ -1403,6 +1593,7 @@
       },
       effects: {
         confettiEnabled: true,
+        timerRockMusic: true,
         quoteRotationEnabled: true,
         confettiParticles: 140
       },
@@ -1498,7 +1689,12 @@
           starterTasks: Array.isArray(sc.starterTasks) ? sc.starterTasks : base.starterTasks,
           leaderboardSeed: sc.leaderboardSeed || base.leaderboardSeed
         };
-        merged.students = Array.isArray(saved.students) ? saved.students : [];
+        merged.students = Array.isArray(saved.students)
+          ? saved.students.map((s) => ({
+              ...s,
+              dayLog: s.dayLog && typeof s.dayLog === "object" ? s.dayLog : {}
+            }))
+          : [];
         merged.currentStudentId = saved.currentStudentId || null;
         if (!merged.students.length && Array.isArray(saved.leaderboard) && saved.leaderboard.length) {
           merged.students = saved.leaderboard.map((row, i) => ({
@@ -1509,7 +1705,8 @@
             level: 1,
             xp: Math.max(0, Number(row.xp) || 0),
             streak: Math.max(0, Number(row.streak) || 0),
-            sessions: 0
+            sessions: 0,
+            dayLog: {}
           }));
         }
         if (!merged.students.length) {
@@ -1529,7 +1726,8 @@
               level: Number.isFinite(lv) && lv >= 1 ? lv : 1,
               xp: Number.isFinite(xp) && xp >= 0 ? xp : 0,
               streak: Number.isFinite(st) && st >= 0 ? st : 0,
-              sessions: Number.isFinite(ses) && ses >= 0 ? ses : 0
+              sessions: Number.isFinite(ses) && ses >= 0 ? ses : 0,
+              dayLog: {}
             });
             merged.currentStudentId = id;
           }
@@ -1598,7 +1796,8 @@
         level: state.level,
         xp: state.xp,
         streak: state.streak,
-        sessions: state.sessions
+        sessions: state.sessions,
+        dayLog: s.dayLog && typeof s.dayLog === "object" ? structuredClone(s.dayLog) : {}
       };
       const idx = state.students.findIndex((x) => x.id === s.id);
       if (idx >= 0) state.students[idx] = { ...state.students[idx], ...row };
@@ -1632,7 +1831,8 @@
           level: pub.level,
           xp: pub.xp,
           streak: pub.streak ?? 0,
-          sessions: pub.sessions ?? 0
+          sessions: pub.sessions ?? 0,
+          dayLog: prev?.dayLog && typeof prev.dayLog === "object" ? prev.dayLog : {}
         };
       });
     }
@@ -1684,7 +1884,8 @@
         timerRemaining: state.timerRemaining,
         timerRunning: state.timerRunning,
         quoteIndex: state.quoteIndex,
-        customization: state.customization
+        customization: state.customization,
+        dayLog: st.dayLog && typeof st.dayLog === "object" ? st.dayLog : {}
       };
     }
 
@@ -1768,6 +1969,7 @@
         },
         effects: {
           confettiEnabled: data.get("confettiEnabled") === "on",
+          timerRockMusic: data.get("timerRockMusic") === "on",
           quoteRotationEnabled: data.get("quoteRotationEnabled") === "on",
           confettiParticles: Number.isFinite(confettiParticles) ? Math.max(40, Math.min(220, confettiParticles)) : defaultCustomization.effects.confettiParticles
         },
@@ -1823,6 +2025,7 @@
       form.sessionsOnTimer.value = g.sessionsOnTimer;
       form.playerName.value = getCurrentStudent()?.name || g.playerName;
       form.confettiEnabled.checked = ef.confettiEnabled;
+      form.timerRockMusic.checked = ef.timerRockMusic !== false;
       form.quoteRotationEnabled.checked = ef.quoteRotationEnabled;
       form.confettiParticles.value = ef.confettiParticles;
       form.insightsHours.value = ins.hours.join(",");
@@ -2070,8 +2273,103 @@
         sessions: state.sessions,
         name: prev.name,
         email: prev.email ?? "",
-        className: prev.className ?? ""
+        className: prev.className ?? "",
+        dayLog: prev.dayLog && typeof prev.dayLog === "object" ? prev.dayLog : {}
       };
+    }
+
+    function ymd(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function last7Dates() {
+      const out = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() - i);
+        out.push(ymd(d));
+      }
+      return out;
+    }
+
+    function last7DayLabels() {
+      const fmt = new Intl.DateTimeFormat(undefined, { weekday: "short" });
+      return last7Dates().map((key) => {
+        const [y, m, day] = key.split("-").map(Number);
+        return fmt.format(new Date(y, m - 1, day));
+      });
+    }
+
+    function ensureStudentDayLog(st) {
+      if (!st) return null;
+      if (!st.dayLog || typeof st.dayLog !== "object") st.dayLog = {};
+      return st.dayLog;
+    }
+
+    function recordTaskInsightActivity(taskXp) {
+      const st = getCurrentStudent();
+      if (!st) return;
+      const log = ensureStudentDayLog(st);
+      const key = ymd(new Date());
+      const cur = log[key] || { focusMinutes: 0, xpGained: 0, tasksDone: 0, streakSnap: 0 };
+      cur.tasksDone += 1;
+      cur.xpGained += taskXp;
+      cur.streakSnap = state.streak;
+      log[key] = cur;
+    }
+
+    function recordTimerInsightActivity(focusMinutes, xpGain) {
+      const st = getCurrentStudent();
+      if (!st) return;
+      const log = ensureStudentDayLog(st);
+      const key = ymd(new Date());
+      const cur = log[key] || { focusMinutes: 0, xpGained: 0, tasksDone: 0, streakSnap: 0 };
+      cur.focusMinutes += focusMinutes;
+      cur.xpGained += xpGain;
+      cur.streakSnap = state.streak;
+      log[key] = cur;
+    }
+
+    function getProgressInsightValues(view) {
+      const st = getCurrentStudent();
+      if (!st || !st.dayLog || typeof st.dayLog !== "object") {
+        return last7Dates().map(() => 0);
+      }
+      const log = st.dayLog;
+      const dates = last7Dates();
+      if (view === "hours") {
+        return dates.map((d) => {
+          const entry = log[d];
+          const mins = entry && typeof entry.focusMinutes === "number" ? entry.focusMinutes : 0;
+          return Math.round((mins / 60) * 100) / 100;
+        });
+      }
+      if (view === "streaks") {
+        return dates.map((d) => {
+          const entry = log[d];
+          return entry && typeof entry.streakSnap === "number" ? entry.streakSnap : 0;
+        });
+      }
+      return dates.map((d) => {
+        const entry = log[d];
+        return entry && typeof entry.xpGained === "number" ? entry.xpGained : 0;
+      });
+    }
+
+    function insightChartNote(view) {
+      if (!getCurrentStudent()) {
+        return labelText("chartNoteNoProfile", defaultLabels.chartNoteNoProfile);
+      }
+      const vals = getProgressInsightValues(view);
+      if (vals.every((v) => !v)) {
+        return labelText("chartNoteEmptyProgress", defaultLabels.chartNoteEmptyProgress);
+      }
+      const key = view === "hours" ? "chartNoteHours" : view === "streaks" ? "chartNoteStreaks" : "chartNoteXp";
+      return labelText(key, defaultLabels[key]);
     }
 
     function openProfileModal(required = false) {
@@ -2147,7 +2445,8 @@
               level: 1,
               xp: 0,
               streak: 0,
-              sessions: 0
+              sessions: 0,
+              dayLog: {}
             });
             state.currentStudentId = id;
             state.level = 1;
@@ -2287,6 +2586,7 @@
       task.completed = true;
       state.streak += g.streakPerTask;
       state.sessions += g.sessionsOnTask;
+      recordTaskInsightActivity(g.xpPerTask);
       const leveled = applyXpFromTaskWithSingleLevelCap(g.xpPerTask);
       if (leveled) {
         burstConfetti();
@@ -2344,7 +2644,119 @@
       showToast(toastFmt("toastTimerSet", { minutes }));
     }
 
+    let focusAudioCtx = null;
+
+    function unlockFocusAudio() {
+      try {
+        if (!focusAudioCtx) focusAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        void focusAudioCtx.resume();
+      } catch (_) {}
+    }
+
+    function makeDistortionCurve(amount) {
+      const n = 44100;
+      const curve = new Float32Array(n);
+      const k = 2 * amount / (1 - amount);
+      for (let i = 0; i < n; i++) {
+        const x = (i * 2) / n - 1;
+        curve[i] = ((1 + k) * x) / (1 + k * Math.abs(x));
+      }
+      return curve;
+    }
+
+    function playRockTimerCelebration() {
+      if (state.customization.effects.timerRockMusic === false) return;
+      unlockFocusAudio();
+      if (!focusAudioCtx) return;
+      const ctx = focusAudioCtx;
+      try {
+        const t0 = ctx.currentTime + 0.03;
+        const master = ctx.createGain();
+        master.gain.value = 0.2;
+        master.connect(ctx.destination);
+
+        const shaper = ctx.createWaveShaper();
+        shaper.curve = makeDistortionCurve(0.72);
+        shaper.oversample = "4x";
+        const chordBus = ctx.createGain();
+        chordBus.connect(shaper);
+        shaper.connect(master);
+
+        function chordPads(startT, dur, freqs) {
+          freqs.forEach((f) => {
+            const osc = ctx.createOscillator();
+            osc.type = "sawtooth";
+            osc.frequency.value = f;
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0.001, startT);
+            g.gain.exponentialRampToValueAtTime(0.09, startT + 0.05);
+            g.gain.setValueAtTime(0.075, startT + Math.max(0.05, dur - 0.12));
+            g.gain.exponentialRampToValueAtTime(0.001, startT + dur);
+            osc.connect(g);
+            g.connect(chordBus);
+            osc.start(startT);
+            osc.stop(startT + dur + 0.08);
+          });
+        }
+
+        function kick(time) {
+          const osc = ctx.createOscillator();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(130, time);
+          osc.frequency.exponentialRampToValueAtTime(36, time + 0.07);
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0.48, time);
+          g.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(time);
+          osc.stop(time + 0.17);
+        }
+
+        function snare(time) {
+          const len = Math.floor(ctx.sampleRate * 0.075);
+          const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+          const d = buf.getChannelData(0);
+          for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-5 * i / len);
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          const hp = ctx.createBiquadFilter();
+          hp.type = "highpass";
+          hp.frequency.value = 1000;
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0.34, time);
+          g.gain.exponentialRampToValueAtTime(0.001, time + 0.11);
+          src.connect(hp);
+          hp.connect(g);
+          g.connect(master);
+          src.start(time);
+        }
+
+        const bpm = 132;
+        const beat = 60 / bpm;
+        const bar = beat * 4;
+        const progression = [
+          [82.41, 123.47, 164.81],
+          [98, 146.83, 196],
+          [110, 164.81, 220],
+          [82.41, 123.47, 196]
+        ];
+        for (let b = 0; b < 4; b++) {
+          const barT = t0 + b * bar;
+          chordPads(barT, bar * 0.97, progression[b]);
+          for (let s = 0; s < 4; s++) {
+            const st = barT + s * beat;
+            kick(st);
+            if (s === 1 || s === 3) snare(st);
+          }
+        }
+      } catch (e) {
+        console.warn("Rock timer audio:", e);
+      }
+    }
+
     function startTimer() {
+      unlockFocusAudio();
       if (state.timerRunning) {
         state.timerRunning = false;
         clearInterval(timerHandle);
@@ -2369,9 +2781,11 @@
           clearInterval(timerHandle);
           timerHandle = null;
           const g = state.customization.game;
+          recordTimerInsightActivity(state.timerMinutes, g.xpPerTimer);
           state.xp += g.xpPerTimer;
           state.sessions += g.sessionsOnTimer;
           burstConfetti();
+          playRockTimerCelebration();
           showToast(toastFmt("toastSessionComplete"));
           const cap = getXpPerLevel();
           while (state.xp >= cap) {
@@ -2444,19 +2858,9 @@
       document.getElementById("sessionValue").textContent = String(state.sessions).padStart(2, "0");
     }
 
-    function chartAxisLabels(view) {
-      const L = state.customization.labels;
-      const key = view === "hours" ? "chartAxisHours" : view === "streaks" ? "chartAxisStreaks" : "chartAxisXp";
-      const fallback = view === "hours" ? defaultLabels.chartAxisHours : view === "streaks" ? defaultLabels.chartAxisStreaks : defaultLabels.chartAxisXp;
-      const parts = String(L[key] || fallback).split(",").map((s) => s.trim()).filter(Boolean);
-      while (parts.length < 7) parts.push(String(parts.length + 1));
-      return parts.slice(0, 7);
-    }
-
     function renderChart(view = "hours") {
-      const ins = state.customization.insights || defaultInsights;
-      const values = ins[view] || defaultInsights[view];
-      const labels = chartAxisLabels(view);
+      const values = getProgressInsightValues(view);
+      const labels = last7DayLabels();
       const pal = state.customization.colors;
       const colors = view === "hours"
         ? [pal.teal, "#34d399", pal.purple, pal.coral, pal.lime, pal.gold, pal.teal]
@@ -2474,8 +2878,7 @@
         item.innerHTML = `<div class="fill"></div><small>${escapeHtml(labels[index])}</small>`;
         chart.appendChild(item);
       });
-      const noteKey = view === "hours" ? "chartNoteHours" : view === "streaks" ? "chartNoteStreaks" : "chartNoteXp";
-      document.getElementById("chartNote").textContent = labelText(noteKey, defaultLabels[noteKey]);
+      document.getElementById("chartNote").textContent = insightChartNote(view);
     }
 
     function render() {
@@ -2681,6 +3084,7 @@
     });
     document.getElementById("closeProfileBtn").addEventListener("click", closeProfileModal);
     document.getElementById("editProfileBtn").addEventListener("click", () => openProfileModal(false));
+    document.getElementById("themeToggleBtn").addEventListener("click", () => toggleTheme());
     profileOverlay.addEventListener("click", (event) => {
       if (event.target === profileOverlay && !profileModalRequired) closeProfileModal();
     });

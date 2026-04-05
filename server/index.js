@@ -94,7 +94,8 @@ app.post("/api/students", async (req, res) => {
       timerRemaining: 25 * 60,
       timerRunning: false,
       quoteIndex: 0,
-      customization: null
+      customization: null,
+      dayLog: {}
     };
     db.students.push(student);
     await writeDb(db);
@@ -118,7 +119,8 @@ const ALLOWED_PUT = new Set([
   "timerRemaining",
   "timerRunning",
   "quoteIndex",
-  "customization"
+  "customization",
+  "dayLog"
 ]);
 
 app.put("/api/students/:id", async (req, res) => {
