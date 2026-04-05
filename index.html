@@ -719,6 +719,122 @@
 
     .toast.show { opacity: 1; transform: translateY(0); }
 
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(2, 6, 14, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .overlay.show { display: grid; }
+
+    .modal {
+      width: min(1100px, 100%);
+      max-height: min(90vh, 980px);
+      overflow: auto;
+      border-radius: 28px;
+      background: rgba(10, 18, 34, 0.98);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .modal-head p { margin: 6px 0 0; color: var(--muted); }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .field label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .field textarea { min-height: 110px; resize: vertical; }
+
+    .swatch-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .swatch {
+      display: grid;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .swatch input {
+      width: 100%;
+      height: 42px;
+      padding: 4px;
+    }
+
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text);
+    }
+
+    .toggle input { width: 18px; height: 18px; }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
     @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes grow { from { height: 12px; opacity: 0.6; } to { opacity: 1; } }
     @keyframes pulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 200, 87, 0.4); } 50% { transform: scale(1.08); box-shadow: 0 0 32px rgba(255, 200, 87, 0.75); } }
@@ -741,27 +857,197 @@
       .content, .shell { padding: 14px; gap: 14px; }
       .topbar { padding: 14px; }
       .ring { width: min(78vw, 250px); }
+      .modal-grid, .swatch-row, .toggle-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <canvas id="confettiCanvas"></canvas>
   <div class="toast" id="toast"></div>
+  <div class="overlay" id="settingsOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="settingsTitle">Customize HabitQuest</h2>
+          <p>Personalize theme, copy, navigation, XP rules, insights data, effects, visibility, quotes, timer presets, and starter tasks.</p>
+        </div>
+        <button class="icon-btn" id="closeSettingsBtn" aria-label="Close settings">✕</button>
+      </div>
+
+      <form id="customForm">
+        <div class="modal-grid">
+          <div class="field">
+            <label for="appNameInput">App name</label>
+            <input id="appNameInput" name="appName" type="text" />
+          </div>
+          <div class="field">
+            <label for="appSubtitleInput">Tagline</label>
+            <input id="appSubtitleInput" name="appSubtitle" type="text" />
+          </div>
+          <div class="field">
+            <label for="fontScaleInput">Font scale</label>
+            <input id="fontScaleInput" name="fontScale" type="range" min="0.9" max="1.2" step="0.01" />
+          </div>
+          <div class="field">
+            <label for="radiusInput">Card radius</label>
+            <input id="radiusInput" name="radius" type="range" min="12" max="34" step="1" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Theme colors</label>
+          <div class="swatch-row">
+            <div class="swatch"><input id="tealInput" name="teal" type="color" /><span>Teal</span></div>
+            <div class="swatch"><input id="purpleInput" name="purple" type="color" /><span>Purple</span></div>
+            <div class="swatch"><input id="coralInput" name="coral" type="color" /><span>Coral</span></div>
+            <div class="swatch"><input id="limeInput" name="lime" type="color" /><span>Lime</span></div>
+            <div class="swatch"><input id="goldInput" name="gold" type="color" /><span>Gold</span></div>
+          </div>
+        </div>
+
+        <div class="modal-grid">
+          <div class="field">
+            <label for="streakTargetInput">Streak target label</label>
+            <input id="streakTargetInput" name="streakTarget" type="text" />
+          </div>
+          <div class="field">
+            <label for="timerPresetsInput">Timer presets</label>
+            <input id="timerPresetsInput" name="timerPresets" type="text" placeholder="25,15,45" />
+          </div>
+          <div class="field">
+            <label for="quoteIntervalInput">Quote rotation ms</label>
+            <input id="quoteIntervalInput" name="quoteInterval" type="number" min="2000" step="500" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="quotesInput">Motivational quotes</label>
+          <textarea id="quotesInput" name="quotes" placeholder="One quote per line"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="tasksInput">Starter tasks</label>
+          <textarea id="tasksInput" name="tasks" placeholder="Title | Detail | done"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="leaderboardInput">Leaderboard rows</label>
+          <textarea id="leaderboardInput" name="leaderboard" placeholder="Name | XP | Streak"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Game rules</label>
+          <div class="modal-grid">
+            <div class="field" style="padding:0;border:none;background:transparent">
+              <label for="xpPerLevelInput">XP per level</label>
+              <input id="xpPerLevelInput" name="xpPerLevel" type="number" min="10" step="1" />
+            </div>
+            <div class="field" style="padding:0;border:none;background:transparent">
+              <label for="xpPerTaskInput">XP per task done</label>
+              <input id="xpPerTaskInput" name="xpPerTask" type="number" min="0" step="1" />
+            </div>
+            <div class="field" style="padding:0;border:none;background:transparent">
+              <label for="xpPerTimerInput">XP per focus session</label>
+              <input id="xpPerTimerInput" name="xpPerTimer" type="number" min="0" step="1" />
+            </div>
+            <div class="field" style="padding:0;border:none;background:transparent">
+              <label for="streakPerTaskInput">Streak + per task</label>
+              <input id="streakPerTaskInput" name="streakPerTask" type="number" min="0" step="1" />
+            </div>
+            <div class="field" style="padding:0;border:none;background:transparent">
+              <label for="sessionsOnTaskInput">Sessions + on task</label>
+              <input id="sessionsOnTaskInput" name="sessionsOnTask" type="number" min="0" step="1" />
+            </div>
+            <div class="field" style="padding:0;border:none;background:transparent">
+              <label for="sessionsOnTimerInput">Sessions + on timer</label>
+              <input id="sessionsOnTimerInput" name="sessionsOnTimer" type="number" min="0" step="1" />
+            </div>
+            <div class="field" style="padding:0;border:none;background:transparent;grid-column:1/-1">
+              <label for="playerNameInput">Your name (leaderboard row)</label>
+              <input id="playerNameInput" name="playerName" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Effects &amp; behavior</label>
+          <div class="toggle-grid">
+            <label class="toggle"><input type="checkbox" id="confettiEnabled" name="confettiEnabled" /> Confetti celebrations</label>
+            <label class="toggle"><input type="checkbox" id="quoteRotationEnabled" name="quoteRotationEnabled" /> Rotate quotes</label>
+          </div>
+          <div class="modal-grid" style="margin-top:12px">
+            <div class="field" style="padding:0;border:none;background:transparent">
+              <label for="confettiParticlesInput">Confetti particles</label>
+              <input id="confettiParticlesInput" name="confettiParticles" type="range" min="40" max="220" step="10" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="insightsHoursInput">Insights — study hours (7 numbers, commas)</label>
+          <input id="insightsHoursInput" name="insightsHours" type="text" placeholder="2.5,3.8,..." />
+        </div>
+        <div class="modal-grid">
+          <div class="field">
+            <label for="insightsStreaksInput">Insights — streaks (7 numbers)</label>
+            <input id="insightsStreaksInput" name="insightsStreaks" type="text" />
+          </div>
+          <div class="field">
+            <label for="insightsXpInput">Insights — XP series (7 numbers)</label>
+            <input id="insightsXpInput" name="insightsXp" type="text" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="navItemsInput">Sidebar nav (one per line: Abbr | Title | Subtitle | id)</label>
+          <textarea id="navItemsInput" name="navItems" placeholder="ST | Study Tasks | Daily checklist | tasks"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="labelsInput">UI labels (one per line: key | text). Keys include brandMark, tasksTitle, timerTitle, focusNote, tabHours, chartNoteHours, …</label>
+          <textarea id="labelsInput" name="labels" style="min-height:200px" placeholder="brandMark | HQ"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Visible sections</label>
+          <div class="toggle-grid">
+            <label class="toggle"><input type="checkbox" name="showSidebar" /> Sidebar</label>
+            <label class="toggle"><input type="checkbox" name="showHero" /> Top stats</label>
+            <label class="toggle"><input type="checkbox" name="showTasks" /> Tasks panel</label>
+            <label class="toggle"><input type="checkbox" name="showTimer" /> Timer panel</label>
+            <label class="toggle"><input type="checkbox" name="showProgress" /> Progress panel</label>
+            <label class="toggle"><input type="checkbox" name="showInsights" /> Insights panel</label>
+            <label class="toggle"><input type="checkbox" name="showLeaderboard" /> Leaderboard panel</label>
+            <label class="toggle"><input type="checkbox" name="showStreak" /> Streak pill</label>
+            <label class="toggle"><input type="checkbox" name="showProfile" /> Profile area</label>
+            <label class="toggle"><input type="checkbox" name="showQuoteBox" /> Motivation quote</label>
+            <label class="toggle"><input type="checkbox" name="showToasts" /> Toast messages</label>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="ghost" id="resetCustomBtn">Reset Defaults</button>
+          <button type="button" class="ghost" id="previewCustomBtn">Preview Changes</button>
+          <button type="submit" class="cta">Save Customization</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark">HQ</div>
+        <div class="brand-mark" id="brandMark">HQ</div>
         <div class="brand-copy">
-          <h1>HabitQuest</h1>
-          <p>Student habit game dashboard</p>
+          <h1 id="appName">HabitQuest</h1>
+          <p id="appSubtitle">Student habit game dashboard</p>
         </div>
       </div>
 
       <div class="streak-pill" id="streakPill">
         <span class="fire"></span>
         <div>
-          <div class="streak-value"><span id="streakValue">12</span>-day streak</div>
+          <div class="streak-value"><span id="streakValue">12</span> <span id="streakTargetLabel">day streak</span></div>
         </div>
       </div>
 
@@ -775,57 +1061,51 @@
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-head">
           <div class="sidebar-title">
-            <strong>Navigation</strong>
-            <span>Quick access</span>
+            <strong id="lblSidebarNavTitle">Navigation</strong>
+            <span id="lblSidebarNavSub">Quick access</span>
           </div>
           <button class="icon-btn" id="collapseBtn" aria-label="Collapse sidebar">☰</button>
         </div>
 
-        <nav class="nav">
-          <button class="nav-item active" data-nav="tasks"><span class="nav-icon">ST</span><span class="nav-label"><strong>Study Tasks</strong><span>Daily checklist</span></span></button>
-          <button class="nav-item" data-nav="timer"><span class="nav-icon">FT</span><span class="nav-label"><strong>Focus Timer</strong><span>Pomodoro mode</span></span></button>
-          <button class="nav-item" data-nav="challenges"><span class="nav-icon">CH</span><span class="nav-label"><strong>Challenges</strong><span>Bonus quests</span></span></button>
-          <button class="nav-item" data-nav="insights"><span class="nav-icon">IN</span><span class="nav-label"><strong>Insights</strong><span>Study patterns</span></span></button>
-          <button class="nav-item" data-nav="leaderboard"><span class="nav-icon">LB</span><span class="nav-label"><strong>Leaderboard</strong><span>Class ranking</span></span></button>
-        </nav>
+        <nav class="nav" id="navRoot"></nav>
 
         <div class="sidebar-footer">
-          <strong>Minimal view</strong>
-          <div class="collapse-copy">Toggle the sidebar for a compact dashboard.</div>
+          <strong id="lblSidebarFooterTitle">Minimal view</strong>
+          <div class="collapse-copy" id="lblSidebarFooterCopy">Toggle the sidebar for a compact dashboard.</div>
         </div>
       </aside>
 
       <section class="content">
-        <section class="hero">
-          <article class="metric"><small>Current Level</small><strong id="levelValue">04</strong><div class="sub">Avatar evolves with XP</div></article>
-          <article class="metric"><small>XP Earned</small><strong><span id="xpValue">64</span>/100</strong><div class="sub">Next level in progress</div></article>
-          <article class="metric"><small>Tasks Done</small><strong id="doneValue">3</strong><div class="sub">Checklist momentum</div></article>
-          <article class="metric"><small>Focus Sessions</small><strong id="sessionValue">08</strong><div class="sub">Today&apos;s Pomodoro count</div></article>
+        <section class="hero" id="heroSection">
+          <article class="metric"><small id="lblHero1">Current Level</small><strong id="levelValue">04</strong><div class="sub" id="lblHero1Sub">Avatar evolves with XP</div></article>
+          <article class="metric"><small id="lblHero2">XP Earned</small><strong><span id="xpValue">64</span><span id="xpSlash">/</span><span id="xpCapLabel">100</span></strong><div class="sub" id="lblHero2Sub">Next level in progress</div></article>
+          <article class="metric"><small id="lblHero3">Tasks Done</small><strong id="doneValue">3</strong><div class="sub" id="lblHero3Sub">Checklist momentum</div></article>
+          <article class="metric"><small id="lblHero4">Focus Sessions</small><strong id="sessionValue">08</strong><div class="sub" id="lblHero4Sub">Today&apos;s Pomodoro count</div></article>
         </section>
 
         <section class="grid-2 equal">
           <article class="panel" id="tasksPanel">
             <div class="panel-header">
               <div>
-                <h2>Tasks Panel</h2>
-                <p>Animated checkmarks, XP bar, and quick task capture.</p>
+                <h2 id="lblTasksTitle">Tasks Panel</h2>
+                <p id="lblTasksSub">Animated checkmarks, XP bar, and quick task capture.</p>
               </div>
               <div class="panel-actions">
-                <button class="chip active">Today</button>
-                <button class="chip">This Week</button>
+                <button type="button" class="chip active" id="lblTaskChip1">Today</button>
+                <button type="button" class="chip" id="lblTaskChip2">This Week</button>
               </div>
             </div>
 
             <div class="task-tools">
               <div class="row">
                 <input id="taskInput" placeholder="Add a study task" />
-                <button class="cta" id="addTaskBtn">Add Task</button>
+                <button type="button" class="cta" id="addTaskBtn">Add Task</button>
               </div>
               <div class="task-list" id="taskList"></div>
             </div>
 
             <div class="bar-shell">
-              <div class="bar-meta"><span>XP bar</span><span id="xpLabel">64/100</span></div>
+              <div class="bar-meta"><span id="lblXpBarLeft">XP bar</span><span id="xpLabel">64/100</span></div>
               <div class="bar"><span id="xpBar"></span></div>
             </div>
           </article>
@@ -833,14 +1113,10 @@
           <article class="panel" id="timerPanel">
             <div class="panel-header">
               <div>
-                <h2>Focus Timer</h2>
-                <p>Pomodoro countdown ring with smooth start and stop transitions.</p>
+                <h2 id="lblTimerTitle">Focus Timer</h2>
+                <p id="lblTimerSub">Pomodoro countdown ring with smooth start and stop transitions.</p>
               </div>
-              <div class="panel-actions">
-                <button class="chip active" data-minutes="25">25m</button>
-                <button class="chip" data-minutes="15">15m</button>
-                <button class="chip" data-minutes="45">45m</button>
-              </div>
+              <div class="panel-actions" id="timerHeaderChips"></div>
             </div>
 
             <div class="timer-layout">
@@ -859,7 +1135,7 @@
                 <div class="timebox">
                   <div>
                     <strong id="timerDisplay">25:00</strong>
-                    <span id="timerState">Ready to focus</span>
+                    <span id="timerState"></span>
                   </div>
                 </div>
               </div>
@@ -867,8 +1143,8 @@
               <div class="timer-copy">
                 <div class="focus-note" id="focusNote">Smooth countdown ring, animated transitions, and reward bursts for every completed session.</div>
                 <div class="timer-controls">
-                  <button class="cta" id="timerToggle">Start Session</button>
-                  <button class="ghost" id="timerReset">Reset</button>
+                  <button type="button" class="cta" id="timerToggle">Start Session</button>
+                  <button type="button" class="ghost" id="timerReset">Reset</button>
                 </div>
                 <div class="preset-row">
                   <button class="ghost">No distractions</button>
@@ -882,19 +1158,19 @@
         <section class="panel" id="progressPanel">
           <div class="panel-header">
             <div>
-              <h2>Progress and Streaks</h2>
-              <p>Fire trail energy, level-up motion, and an evolving avatar stage.</p>
+              <h2 id="lblProgressTitle">Progress and Streaks</h2>
+              <p id="lblProgressSub">Fire trail energy, level-up motion, and an evolving avatar stage.</p>
             </div>
             <div class="panel-actions">
-              <button class="chip active">Momentum</button>
-              <button class="chip">Rewards</button>
+              <button type="button" class="chip active" id="lblProgressChip1">Momentum</button>
+              <button type="button" class="chip" id="lblProgressChip2">Rewards</button>
             </div>
           </div>
 
           <div class="progress-hero">
             <div class="progress-copy">
               <div class="bar-shell">
-                <div class="bar-meta"><span>XP progress</span><span id="progressLabel">64%</span></div>
+                <div class="bar-meta"><span id="lblProgressBarLeft">XP progress</span><span id="progressLabel">64%</span></div>
                 <div class="bar"><span id="progressBar"></span></div>
               </div>
               <div class="quote" id="quoteBox">"Small wins compound into big results. Finish the next task."</div>
@@ -912,14 +1188,14 @@
           <article class="panel" id="insightsPanel">
             <div class="panel-header">
               <div>
-                <h2>Insights Panel</h2>
-                <p>Animated study hours, streaks, and XP growth snapshots.</p>
+                <h2 id="lblInsightsTitle">Insights Panel</h2>
+                <p id="lblInsightsSub">Animated study hours, streaks, and XP growth snapshots.</p>
               </div>
             </div>
             <div class="insights-tabs">
-              <button class="tab active" data-view="hours">Study Hours</button>
-              <button class="tab" data-view="streaks">Streaks</button>
-              <button class="tab" data-view="xp">XP Growth</button>
+              <button type="button" class="tab active" data-view="hours" id="lblTabHours">Study Hours</button>
+              <button type="button" class="tab" data-view="streaks" id="lblTabStreaks">Streaks</button>
+              <button type="button" class="tab" data-view="xp" id="lblTabXp">XP Growth</button>
             </div>
             <div class="chart-wrap">
               <div class="chart" id="chart"></div>
@@ -930,12 +1206,12 @@
           <article class="panel" id="leaderboardPanel">
             <div class="panel-header">
               <div>
-                <h2>Leaderboard Panel</h2>
-                <p>Position changes animate as rankings update.</p>
+                <h2 id="lblLeaderTitle">Leaderboard Panel</h2>
+                <p id="lblLeaderSub">Position changes animate as rankings update.</p>
               </div>
             </div>
             <div class="leaderboard" id="leaderboard"></div>
-            <div class="leader-note">Top 3 students get a highlighted glow for fast scanning.</div>
+            <div class="leader-note" id="lblLeaderFootnote">Top 3 students get a highlighted glow for fast scanning.</div>
           </article>
         </section>
       </section>
@@ -944,7 +1220,6 @@
 
   <script>
     const STORAGE_KEY = "habitquest-dashboard-v1";
-    const LEVEL_XP = 100;
     const quotes = [
       "Small wins compound into big results. Finish the next task.",
       "Focus for 25 minutes now, enjoy future-you later.",
@@ -952,10 +1227,149 @@
       "The streak is built one completed session at a time."
     ];
 
-    const insights = {
+    const defaultInsights = {
       hours: [2.5, 3.8, 4.1, 5.2, 4.6, 6.0, 6.8],
       streaks: [4, 5, 5, 7, 8, 10, 12],
       xp: [20, 31, 44, 56, 68, 84, 96]
+    };
+
+    const defaultNavItems = [
+      { abbr: "ST", title: "Study Tasks", subtitle: "Daily checklist", nav: "tasks" },
+      { abbr: "FT", title: "Focus Timer", subtitle: "Pomodoro mode", nav: "timer" },
+      { abbr: "CH", title: "Challenges", subtitle: "Bonus quests", nav: "challenges" },
+      { abbr: "IN", title: "Insights", subtitle: "Study patterns", nav: "insights" },
+      { abbr: "LB", title: "Leaderboard", subtitle: "Class ranking", nav: "leaderboard" }
+    ];
+
+    const defaultLabels = {
+      brandMark: "HQ",
+      sidebarNavTitle: "Navigation",
+      sidebarNavSub: "Quick access",
+      sidebarFooterTitle: "Minimal view",
+      sidebarFooterCopy: "Toggle the sidebar for a compact dashboard.",
+      hero1: "Current Level",
+      hero1Sub: "Avatar evolves with XP",
+      hero2: "XP Earned",
+      hero2Sub: "Next level in progress",
+      hero3: "Tasks Done",
+      hero3Sub: "Checklist momentum",
+      hero4: "Focus Sessions",
+      hero4Sub: "Today's Pomodoro count",
+      tasksTitle: "Tasks Panel",
+      tasksSub: "Animated checkmarks, XP bar, and quick task capture.",
+      taskChip1: "Today",
+      taskChip2: "This Week",
+      taskInputPlaceholder: "Add a study task",
+      addTaskBtn: "Add Task",
+      xpBarLeft: "XP bar",
+      timerTitle: "Focus Timer",
+      timerSub: "Pomodoro countdown ring with smooth start and stop transitions.",
+      focusNote: "Smooth countdown ring, animated transitions, and reward bursts for every completed session.",
+      timerStartLabel: "Start Session",
+      timerPauseLabel: "Pause Session",
+      timerResetLabel: "Reset",
+      timerStateReady: "Ready to focus",
+      timerStateFocus: "Focus session in progress",
+      timerStatePaused: "Paused",
+      progressTitle: "Progress and Streaks",
+      progressSub: "Fire trail energy, level-up motion, and an evolving avatar stage.",
+      progressChip1: "Momentum",
+      progressChip2: "Rewards",
+      progressBarLeft: "XP progress",
+      insightsTitle: "Insights Panel",
+      insightsSub: "Animated study hours, streaks, and XP growth snapshots.",
+      tabHours: "Study Hours",
+      tabStreaks: "Streaks",
+      tabXp: "XP Growth",
+      leaderTitle: "Leaderboard Panel",
+      leaderSub: "Position changes animate as rankings update.",
+      leaderFootnote: "Top 3 students get a highlighted glow for fast scanning.",
+      levelPrefix: "Level",
+      levelBannerLow: "Your avatar is evolving with every level.",
+      levelBannerHigh: "Elite scholar mode unlocked.",
+      chartNoteHours: "Weekly study hours are trending upward.",
+      chartNoteStreaks: "Streak consistency is becoming stronger.",
+      chartNoteXp: "XP growth is compounding with each session.",
+      chartAxisHours: "M,T,W,T,F,S,S",
+      chartAxisStreaks: "1,2,3,4,5,6,7",
+      chartAxisXp: "10,20,30,40,50,60,70",
+      leaderStreakSuffix: "-day streak",
+      leaderYouTag: "(You)",
+      newTaskDetail: "New student quest",
+      completeBtnTodo: "Complete",
+      completeBtnDone: "Completed",
+      toastTaskAlready: "Task already completed today.",
+      toastTaskAdded: "New task added to your quest log.",
+      toastLevelUp: "Level up! You reached level {level}.",
+      toastTimerSet: "Timer set to {minutes} minutes.",
+      toastTimerPaused: "Session paused.",
+      toastTimerStarted: "Focus session started.",
+      toastSessionComplete: "Session complete. Bonus XP awarded.",
+      toastTimerReset: "Timer reset.",
+      toastSaved: "Customization saved.",
+      toastPreview: "Preview updated.",
+      toastDefaultsRestored: "Defaults restored."
+    };
+
+    const defaultCustomization = {
+      appName: "HabitQuest",
+      appSubtitle: "Student habit game dashboard",
+      fontScale: 1,
+      radius: 24,
+      colors: {
+        teal: "#2de2e6",
+        purple: "#8d5cff",
+        coral: "#ff6b6b",
+        lime: "#b7f34c",
+        gold: "#ffc857"
+      },
+      streakTargetLabel: "day streak",
+      timerPresets: [25, 15, 45],
+      quoteInterval: 6500,
+      quotes: quotes,
+      starterTasks: [
+        { title: "Review biology notes", detail: "15 min recap before dinner", completed: true },
+        { title: "Solve algebra problems", detail: "Aim for 10 focused questions", completed: true },
+        { title: "Read history chapter", detail: "Highlight key dates and events", completed: true },
+        { title: "Write reflection journal", detail: "One paragraph about progress", completed: false }
+      ],
+      leaderboardSeed: [
+        { name: "Maya", xp: 164, streak: 18 },
+        { name: "You", xp: 164, streak: 12 },
+        { name: "Arjun", xp: 141, streak: 16 },
+        { name: "Leah", xp: 122, streak: 10 },
+        { name: "Noah", xp: 108, streak: 9 }
+      ],
+      game: {
+        xpPerLevel: 100,
+        xpPerTask: 20,
+        xpPerTimer: 15,
+        streakPerTask: 1,
+        sessionsOnTask: 1,
+        sessionsOnTimer: 1,
+        playerName: "You"
+      },
+      effects: {
+        confettiEnabled: true,
+        quoteRotationEnabled: true,
+        confettiParticles: 140
+      },
+      insights: structuredClone(defaultInsights),
+      navItems: structuredClone(defaultNavItems),
+      labels: { ...defaultLabels },
+      visible: {
+        showSidebar: true,
+        showHero: true,
+        showTasks: true,
+        showTimer: true,
+        showProgress: true,
+        showInsights: true,
+        showLeaderboard: true,
+        showStreak: true,
+        showProfile: true,
+        showQuoteBox: true,
+        showToasts: true
+      }
     };
 
     const defaultState = {
@@ -968,25 +1382,16 @@
       timerRemaining: 25 * 60,
       timerRunning: false,
       quoteIndex: 0,
-      tasks: [
-        { title: "Review biology notes", detail: "15 min recap before dinner", completed: true },
-        { title: "Solve algebra problems", detail: "Aim for 10 focused questions", completed: true },
-        { title: "Read history chapter", detail: "Highlight key dates and events", completed: true },
-        { title: "Write reflection journal", detail: "One paragraph about progress", completed: false }
-      ],
-      leaderboard: [
-        { name: "Maya", xp: 164, streak: 18 },
-        { name: "You", xp: 164, streak: 12 },
-        { name: "Arjun", xp: 141, streak: 16 },
-        { name: "Leah", xp: 122, streak: 10 },
-        { name: "Noah", xp: 108, streak: 9 }
-      ]
+      customization: defaultCustomization,
+      tasks: structuredClone(defaultCustomization.starterTasks),
+      leaderboard: structuredClone(defaultCustomization.leaderboardSeed)
     };
 
     const state = loadState();
     let timerHandle = null;
     let quoteHandle = null;
     let confettiHandle = null;
+    let settingsOpen = false;
 
     const shell = document.getElementById("shell");
     const sidebar = document.getElementById("sidebar");
@@ -998,22 +1403,376 @@
     const ctx = confettiCanvas.getContext("2d");
     const timerRing = document.getElementById("timerRing");
     const ringCircumference = 2 * Math.PI * 88;
+    const presetRow = document.querySelector(".preset-row");
+    const appNameEl = document.getElementById("appName");
+    const appSubtitleEl = document.getElementById("appSubtitle");
+    const settingsOverlay = document.getElementById("settingsOverlay");
+    const customForm = document.getElementById("customForm");
 
     timerRing.style.strokeDasharray = ringCircumference;
     timerRing.style.strokeDashoffset = ringCircumference;
 
     function loadState() {
       try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        return { ...defaultState, ...saved, tasks: saved?.tasks ?? defaultState.tasks, leaderboard: saved?.leaderboard ?? defaultState.leaderboard };
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || {};
+        const merged = structuredClone(defaultState);
+        Object.assign(merged, saved);
+        const base = structuredClone(defaultCustomization);
+        const sc = saved.customization || {};
+        merged.customization = {
+          ...base,
+          ...sc,
+          colors: { ...base.colors, ...(sc.colors || {}) },
+          visible: { ...base.visible, ...(sc.visible || {}) },
+          game: { ...base.game, ...(sc.game || {}) },
+          effects: { ...base.effects, ...(sc.effects || {}) },
+          insights: {
+            hours: Array.isArray(sc.insights?.hours) ? sc.insights.hours : base.insights.hours,
+            streaks: Array.isArray(sc.insights?.streaks) ? sc.insights.streaks : base.insights.streaks,
+            xp: Array.isArray(sc.insights?.xp) ? sc.insights.xp : base.insights.xp
+          },
+          navItems: Array.isArray(sc.navItems) && sc.navItems.length ? sc.navItems : base.navItems,
+          labels: { ...base.labels, ...(sc.labels || {}) },
+          timerPresets: sc.timerPresets || base.timerPresets,
+          quotes: sc.quotes || base.quotes,
+          starterTasks: sc.starterTasks || base.starterTasks,
+          leaderboardSeed: sc.leaderboardSeed || base.leaderboardSeed
+        };
+        merged.tasks = saved.tasks || merged.customization.starterTasks;
+        merged.leaderboard = saved.leaderboard || merged.customization.leaderboardSeed;
+        return merged;
       } catch {
         return structuredClone(defaultState);
       }
     }
 
+    function parseTaskLines(value) {
+      return value.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
+        const [title = "", detail = "New quest", completed = "0"] = line.split("|").map((part) => part.trim());
+        return { title, detail, completed: ["1", "true", "done", "yes"].includes(completed.toLowerCase()) };
+      }).filter((task) => task.title);
+    }
+
+    function parseLeaderboardLines(value) {
+      return value.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
+        const [name = "", xp = "0", streak = "0"] = line.split("|").map((part) => part.trim());
+        return { name, xp: Number(xp) || 0, streak: Number(streak) || 0 };
+      }).filter((player) => player.name);
+    }
+
+    function parseTimerPresets(value) {
+      return value.split(",").map((item) => Number(item.trim())).filter((num) => Number.isFinite(num) && num > 0).slice(0, 5);
+    }
+
+    function parseNumberSeries(raw, fallback, count = 7) {
+      const parts = String(raw || "").split(",").map((s) => Number(s.trim()));
+      const nums = parts.filter((n) => Number.isFinite(n));
+      if (nums.length < count) return fallback.slice(0, count);
+      return nums.slice(0, count);
+    }
+
+    function parseNavItemsText(raw) {
+      const lines = String(raw || "").split("\n").map((l) => l.trim()).filter(Boolean);
+      const out = lines.map((line) => {
+        const [abbr = "", title = "", subtitle = "", nav = ""] = line.split("|").map((p) => p.trim());
+        return { abbr: abbr.slice(0, 6), title, subtitle, nav: nav || "tasks" };
+      }).filter((row) => row.title && row.abbr);
+      return out.length ? out : structuredClone(defaultNavItems);
+    }
+
+    function parseLabelLines(raw) {
+      const lines = String(raw || "").split("\n").map((l) => l.trim()).filter(Boolean);
+      const merged = { ...defaultLabels };
+      lines.forEach((line) => {
+        const pipe = line.indexOf("|");
+        if (pipe < 0) return;
+        const key = line.slice(0, pipe).trim();
+        const val = line.slice(pipe + 1).trim();
+        if (key && val !== undefined) merged[key] = val;
+      });
+      return merged;
+    }
+
+    function collectCustomizationFromForm(form) {
+      const data = new FormData(form);
+      const xpPerLevel = Number(data.get("xpPerLevel"));
+      const confettiParticles = Number(data.get("confettiParticles"));
+      return {
+        appName: String(data.get("appName") || defaultCustomization.appName),
+        appSubtitle: String(data.get("appSubtitle") || defaultCustomization.appSubtitle),
+        fontScale: Number(data.get("fontScale") || defaultCustomization.fontScale),
+        radius: Number(data.get("radius") || defaultCustomization.radius),
+        colors: {
+          teal: String(data.get("teal") || defaultCustomization.colors.teal),
+          purple: String(data.get("purple") || defaultCustomization.colors.purple),
+          coral: String(data.get("coral") || defaultCustomization.colors.coral),
+          lime: String(data.get("lime") || defaultCustomization.colors.lime),
+          gold: String(data.get("gold") || defaultCustomization.colors.gold)
+        },
+        streakTargetLabel: String(data.get("streakTarget") || defaultCustomization.streakTargetLabel),
+        timerPresets: parseTimerPresets(String(data.get("timerPresets") || "")),
+        quoteInterval: Number(data.get("quoteInterval") || defaultCustomization.quoteInterval),
+        quotes: String(data.get("quotes") || "").split("\n").map((item) => item.trim()).filter(Boolean),
+        starterTasks: parseTaskLines(String(data.get("tasks") || "")),
+        leaderboardSeed: parseLeaderboardLines(String(data.get("leaderboard") || "")),
+        game: {
+          xpPerLevel: Number.isFinite(xpPerLevel) && xpPerLevel >= 10 ? xpPerLevel : defaultCustomization.game.xpPerLevel,
+          xpPerTask: Math.max(0, Number(data.get("xpPerTask")) || defaultCustomization.game.xpPerTask),
+          xpPerTimer: Math.max(0, Number(data.get("xpPerTimer")) || defaultCustomization.game.xpPerTimer),
+          streakPerTask: Math.max(0, Number(data.get("streakPerTask")) || defaultCustomization.game.streakPerTask),
+          sessionsOnTask: Math.max(0, Number(data.get("sessionsOnTask")) || defaultCustomization.game.sessionsOnTask),
+          sessionsOnTimer: Math.max(0, Number(data.get("sessionsOnTimer")) || defaultCustomization.game.sessionsOnTimer),
+          playerName: String(data.get("playerName") || defaultCustomization.game.playerName).trim() || defaultCustomization.game.playerName
+        },
+        effects: {
+          confettiEnabled: data.get("confettiEnabled") === "on",
+          quoteRotationEnabled: data.get("quoteRotationEnabled") === "on",
+          confettiParticles: Number.isFinite(confettiParticles) ? Math.max(40, Math.min(220, confettiParticles)) : defaultCustomization.effects.confettiParticles
+        },
+        insights: {
+          hours: parseNumberSeries(data.get("insightsHours"), defaultInsights.hours),
+          streaks: parseNumberSeries(data.get("insightsStreaks"), defaultInsights.streaks),
+          xp: parseNumberSeries(data.get("insightsXp"), defaultInsights.xp)
+        },
+        navItems: parseNavItemsText(String(data.get("navItems") || "")),
+        labels: parseLabelLines(String(data.get("labels") || "")),
+        visible: {
+          showSidebar: data.get("showSidebar") === "on",
+          showHero: data.get("showHero") === "on",
+          showTasks: data.get("showTasks") === "on",
+          showTimer: data.get("showTimer") === "on",
+          showProgress: data.get("showProgress") === "on",
+          showInsights: data.get("showInsights") === "on",
+          showLeaderboard: data.get("showLeaderboard") === "on",
+          showStreak: data.get("showStreak") === "on",
+          showProfile: data.get("showProfile") === "on",
+          showQuoteBox: data.get("showQuoteBox") === "on",
+          showToasts: data.get("showToasts") === "on"
+        }
+      };
+    }
+
+    function populateCustomizationForm() {
+      const form = customForm;
+      const customization = state.customization;
+      const g = customization.game;
+      const ef = customization.effects;
+      const ins = customization.insights;
+      form.appName.value = customization.appName;
+      form.appSubtitle.value = customization.appSubtitle;
+      form.fontScale.value = customization.fontScale;
+      form.radius.value = customization.radius;
+      form.teal.value = customization.colors.teal;
+      form.purple.value = customization.colors.purple;
+      form.coral.value = customization.colors.coral;
+      form.lime.value = customization.colors.lime;
+      form.gold.value = customization.colors.gold;
+      form.streakTarget.value = customization.streakTargetLabel;
+      form.timerPresets.value = customization.timerPresets.join(",");
+      form.quoteInterval.value = customization.quoteInterval;
+      form.quotes.value = customization.quotes.join("\n");
+      form.tasks.value = customization.starterTasks.map((task) => `${task.title} | ${task.detail} | ${task.completed ? "done" : "0"}`).join("\n");
+      form.leaderboard.value = customization.leaderboardSeed.map((player) => `${player.name} | ${player.xp} | ${player.streak}`).join("\n");
+      form.xpPerLevel.value = g.xpPerLevel;
+      form.xpPerTask.value = g.xpPerTask;
+      form.xpPerTimer.value = g.xpPerTimer;
+      form.streakPerTask.value = g.streakPerTask;
+      form.sessionsOnTask.value = g.sessionsOnTask;
+      form.sessionsOnTimer.value = g.sessionsOnTimer;
+      form.playerName.value = g.playerName;
+      form.confettiEnabled.checked = ef.confettiEnabled;
+      form.quoteRotationEnabled.checked = ef.quoteRotationEnabled;
+      form.confettiParticles.value = ef.confettiParticles;
+      form.insightsHours.value = ins.hours.join(",");
+      form.insightsStreaks.value = ins.streaks.join(",");
+      form.insightsXp.value = ins.xp.join(",");
+      form.navItems.value = customization.navItems.map((row) => `${row.abbr} | ${row.title} | ${row.subtitle} | ${row.nav}`).join("\n");
+      form.labels.value = Object.keys(defaultLabels).map((key) => `${key} | ${customization.labels[key] ?? defaultLabels[key]}`).join("\n");
+      Object.entries(customization.visible).forEach(([key, value]) => {
+        if (form[key]) form[key].checked = value;
+      });
+    }
+
+    function labelText(key, fallback = "") {
+      const v = state.customization.labels[key];
+      return v != null && String(v).length ? String(v) : fallback;
+    }
+
+    function applyLabels() {
+      const L = state.customization.labels;
+      const set = (id, key) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = L[key] ?? defaultLabels[key] ?? "";
+      };
+      set("brandMark", "brandMark");
+      set("lblSidebarNavTitle", "sidebarNavTitle");
+      set("lblSidebarNavSub", "sidebarNavSub");
+      set("lblSidebarFooterTitle", "sidebarFooterTitle");
+      set("lblSidebarFooterCopy", "sidebarFooterCopy");
+      set("lblHero1", "hero1");
+      set("lblHero1Sub", "hero1Sub");
+      set("lblHero2", "hero2");
+      set("lblHero2Sub", "hero2Sub");
+      set("lblHero3", "hero3");
+      set("lblHero3Sub", "hero3Sub");
+      set("lblHero4", "hero4");
+      set("lblHero4Sub", "hero4Sub");
+      set("lblTasksTitle", "tasksTitle");
+      set("lblTasksSub", "tasksSub");
+      set("lblTaskChip1", "taskChip1");
+      set("lblTaskChip2", "taskChip2");
+      set("lblXpBarLeft", "xpBarLeft");
+      set("lblTimerTitle", "timerTitle");
+      set("lblTimerSub", "timerSub");
+      set("focusNote", "focusNote");
+      set("lblProgressTitle", "progressTitle");
+      set("lblProgressSub", "progressSub");
+      set("lblProgressChip1", "progressChip1");
+      set("lblProgressChip2", "progressChip2");
+      set("lblProgressBarLeft", "progressBarLeft");
+      set("lblInsightsTitle", "insightsTitle");
+      set("lblInsightsSub", "insightsSub");
+      set("lblTabHours", "tabHours");
+      set("lblTabStreaks", "tabStreaks");
+      set("lblTabXp", "tabXp");
+      set("lblLeaderTitle", "leaderTitle");
+      set("lblLeaderSub", "leaderSub");
+      set("lblLeaderFootnote", "leaderFootnote");
+      const ti = document.getElementById("taskInput");
+      if (ti) ti.placeholder = L.taskInputPlaceholder ?? defaultLabels.taskInputPlaceholder;
+      const addBtn = document.getElementById("addTaskBtn");
+      if (addBtn) addBtn.textContent = L.addTaskBtn ?? defaultLabels.addTaskBtn;
+      const resetBtn = document.getElementById("timerReset");
+      if (resetBtn) resetBtn.textContent = L.timerResetLabel ?? defaultLabels.timerResetLabel;
+    }
+
+    function renderNav() {
+      const navRoot = document.getElementById("navRoot");
+      if (!navRoot) return;
+      const items = state.customization.navItems.length ? state.customization.navItems : defaultNavItems;
+      navRoot.innerHTML = "";
+      items.forEach((row, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `nav-item${i === 0 ? " active" : ""}`;
+        btn.dataset.nav = row.nav;
+        btn.innerHTML = `<span class="nav-icon">${escapeHtml(row.abbr)}</span><span class="nav-label"><strong>${escapeHtml(row.title)}</strong><span>${escapeHtml(row.subtitle)}</span></span>`;
+        btn.addEventListener("click", () => {
+          navRoot.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+          btn.classList.add("active");
+          const panel = document.getElementById(`${row.nav}Panel`);
+          if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        navRoot.appendChild(btn);
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function renderTimerHeaderChips() {
+      const wrap = document.getElementById("timerHeaderChips");
+      if (!wrap) return;
+      const presets = state.customization.timerPresets.length ? state.customization.timerPresets : defaultCustomization.timerPresets;
+      wrap.innerHTML = "";
+      presets.forEach((minutes, i) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = `chip${minutes === state.timerMinutes ? " active" : ""}`;
+        b.dataset.minutes = String(minutes);
+        b.textContent = `${minutes}m`;
+        wrap.appendChild(b);
+      });
+    }
+
+    function updateTimerRingGradient() {
+      const c = state.customization.colors;
+      const g = document.querySelector("#timerGradient");
+      if (!g) return;
+      const stops = g.querySelectorAll("stop");
+      if (stops[0]) stops[0].setAttribute("stop-color", c.teal);
+      if (stops[1]) stops[1].setAttribute("stop-color", c.purple);
+      if (stops[2]) stops[2].setAttribute("stop-color", c.coral);
+    }
+
+    function applyCustomization() {
+      const c = state.customization;
+      const root = document.documentElement;
+      root.style.setProperty("--teal", c.colors.teal);
+      root.style.setProperty("--purple", c.colors.purple);
+      root.style.setProperty("--coral", c.colors.coral);
+      root.style.setProperty("--lime", c.colors.lime);
+      root.style.setProperty("--gold", c.colors.gold);
+      root.style.setProperty("--radius", `${c.radius}px`);
+      root.style.setProperty("--font-scale", String(c.fontScale));
+      root.style.fontSize = `${16 * c.fontScale}px`;
+      appNameEl.textContent = c.appName;
+      appSubtitleEl.textContent = c.appSubtitle;
+      document.title = c.appName;
+      document.getElementById("streakTargetLabel").textContent = c.streakTargetLabel;
+      applyLabels();
+      renderTimerHeaderChips();
+      updateTimerRingGradient();
+      renderTimerPresets();
+      renderQuotesIntoState();
+      updateSectionVisibility();
+    }
+
+    function updateSectionVisibility() {
+      const c = state.customization.visible;
+      shell.style.gridTemplateColumns = c.showSidebar ? (state.collapsed ? "var(--sidebar-collapsed) 1fr" : "var(--sidebar) 1fr") : "1fr";
+      shell.classList.toggle("collapsed", state.collapsed && c.showSidebar);
+      sidebar.classList.toggle("collapsed", state.collapsed);
+      document.getElementById("streakPill").classList.toggle("hidden", !c.showStreak);
+      document.getElementById("tasksPanel").classList.toggle("hidden", !c.showTasks);
+      document.getElementById("timerPanel").classList.toggle("hidden", !c.showTimer);
+      document.getElementById("progressPanel").classList.toggle("hidden", !c.showProgress);
+      document.getElementById("insightsPanel").classList.toggle("hidden", !c.showInsights);
+      document.getElementById("leaderboardPanel").classList.toggle("hidden", !c.showLeaderboard);
+      document.getElementById("heroSection").classList.toggle("hidden", !c.showHero);
+      sidebar.classList.toggle("hidden", !c.showSidebar);
+      document.getElementById("miniAvatar").classList.toggle("hidden", !c.showProfile);
+      const quoteBox = document.getElementById("quoteBox");
+      if (quoteBox) quoteBox.classList.toggle("hidden", !c.showQuoteBox);
+    }
+
+    function renderTimerPresets() {
+      presetRow.innerHTML = "";
+      (state.customization.timerPresets.length ? state.customization.timerPresets : defaultCustomization.timerPresets).forEach((minutes) => {
+        const button = document.createElement("button");
+        button.className = "ghost";
+        button.textContent = `${minutes}m`;
+        button.addEventListener("click", () => setTimerMinutes(minutes));
+        presetRow.appendChild(button);
+      });
+    }
+
+    function renderQuotesIntoState() {
+      if (!state.customization.quotes.length) state.customization.quotes = structuredClone(defaultCustomization.quotes);
+      while (state.quoteIndex >= state.customization.quotes.length) state.quoteIndex = 0;
+    }
+
+    function getActiveQuotes() {
+      return state.customization.quotes.length ? state.customization.quotes : defaultCustomization.quotes;
+    }
+
+    function setQuoteLoop() {
+      clearInterval(quoteHandle);
+      const c = state.customization;
+      if (!c.effects.quoteRotationEnabled || !c.visible.showQuoteBox) return;
+      quoteHandle = setInterval(animateQuote, clamp(c.quoteInterval, 2000, 30000));
+    }
+
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
+
+    window.addEventListener("beforeunload", () => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (_) {}
+    });
 
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
@@ -1026,10 +1785,24 @@
     }
 
     function showToast(message) {
+      if (!state.customization.visible.showToasts) return;
       toast.textContent = message;
       toast.classList.add("show");
       clearTimeout(showToast._timer);
       showToast._timer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function toastFmt(key, vars = {}) {
+      let t = state.customization.labels[key] ?? defaultLabels[key] ?? "";
+      Object.keys(vars).forEach((k) => {
+        t = t.replace(new RegExp(`\\{${k}\\}`, "g"), String(vars[k]));
+      });
+      return t;
+    }
+
+    function getXpPerLevel() {
+      const v = state.customization.game.xpPerLevel;
+      return Number.isFinite(v) && v >= 10 ? v : defaultCustomization.game.xpPerLevel;
     }
 
     function updateAvatar() {
@@ -1037,14 +1810,20 @@
       document.getElementById("miniAvatar").textContent = badge;
       document.getElementById("bigAvatar").textContent = badge;
       document.getElementById("levelValue").textContent = String(state.level).padStart(2, "0");
-      document.getElementById("levelText").textContent = `Level ${state.level}`;
-      document.getElementById("levelBanner").textContent = state.level < 10 ? "Your avatar is evolving with every level." : "Elite scholar mode unlocked.";
+      const lp = labelText("levelPrefix", defaultLabels.levelPrefix);
+      document.getElementById("levelText").textContent = `${lp} ${state.level}`;
+      document.getElementById("levelBanner").textContent = state.level < 10
+        ? labelText("levelBannerLow", defaultLabels.levelBannerLow)
+        : labelText("levelBannerHigh", defaultLabels.levelBannerHigh);
     }
 
     function updateXp() {
-      const xpPercent = clamp((state.xp / LEVEL_XP) * 100, 0, 100);
+      const cap = getXpPerLevel();
+      const xpPercent = clamp((state.xp / cap) * 100, 0, 100);
       document.getElementById("xpValue").textContent = state.xp;
-      document.getElementById("xpLabel").textContent = `${state.xp}/${LEVEL_XP}`;
+      const capEl = document.getElementById("xpCapLabel");
+      if (capEl) capEl.textContent = String(cap);
+      document.getElementById("xpLabel").textContent = `${state.xp}/${cap}`;
       document.getElementById("xpBar").style.width = `${xpPercent}%`;
       document.getElementById("progressBar").style.width = `${xpPercent}%`;
       document.getElementById("progressLabel").textContent = `${Math.round(xpPercent)}%`;
@@ -1053,6 +1832,9 @@
     }
 
     function renderTasks() {
+      const L = state.customization.labels;
+      const doneLbl = L.completeBtnDone ?? defaultLabels.completeBtnDone;
+      const todoLbl = L.completeBtnTodo ?? defaultLabels.completeBtnTodo;
       taskList.innerHTML = "";
       state.tasks.forEach((task, index) => {
         const row = document.createElement("div");
@@ -1060,10 +1842,10 @@
         row.innerHTML = `
           <button class="check" aria-label="Toggle task">${task.completed ? "✓" : ""}</button>
           <div class="task-copy">
-            <strong>${task.title}</strong>
-            <span>${task.detail}</span>
+            <strong>${escapeHtml(task.title)}</strong>
+            <span>${escapeHtml(task.detail)}</span>
           </div>
-          <button>${task.completed ? "Completed" : "Complete"}</button>
+          <button type="button">${task.completed ? escapeHtml(doneLbl) : escapeHtml(todoLbl)}</button>
         `;
 
         row.querySelectorAll("button").forEach((button) => {
@@ -1076,28 +1858,31 @@
     }
 
     function toggleTask(index) {
+      const g = state.customization.game;
+      const me = g.playerName || defaultCustomization.game.playerName;
       const task = state.tasks[index];
       if (task.completed) {
-        showToast("Task already completed today.");
+        showToast(toastFmt("toastTaskAlready"));
         return;
       }
 
       task.completed = true;
-      state.xp += 20;
-      state.streak += 1;
-      state.sessions += 1;
-      state.leaderboard = state.leaderboard.map((player) => player.name === "You" ? { ...player, xp: player.xp + 20, streak: state.streak } : player);
+      state.xp += g.xpPerTask;
+      state.streak += g.streakPerTask;
+      state.sessions += g.sessionsOnTask;
+      state.leaderboard = state.leaderboard.map((player) => player.name === me ? { ...player, xp: player.xp + g.xpPerTask, streak: state.streak } : player);
 
-      while (state.xp >= LEVEL_XP) {
-        state.xp -= LEVEL_XP;
+      const cap = getXpPerLevel();
+      while (state.xp >= cap) {
+        state.xp -= cap;
         state.level += 1;
         burstConfetti();
-        showToast(`Level up! You reached level ${state.level}.`);
+        showToast(toastFmt("toastLevelUp", { level: state.level }));
       }
 
       saveState();
       render();
-      animateQuote();
+      if (state.customization.visible.showQuoteBox) animateQuote();
     }
 
     function addTask() {
@@ -1105,19 +1890,28 @@
       const value = input.value.trim();
       if (!value) return;
 
-      state.tasks.unshift({ title: value, detail: "New student quest", completed: false });
+      const detail = labelText("newTaskDetail", defaultLabels.newTaskDetail);
+      state.tasks.unshift({ title: value, detail, completed: false });
       input.value = "";
       saveState();
       renderTasks();
-      showToast("New task added to your quest log.");
+      showToast(toastFmt("toastTaskAdded"));
     }
 
     function updateTimerUI() {
+      const L = state.customization.labels;
       document.getElementById("timerDisplay").textContent = formatTime(state.timerRemaining);
-      document.getElementById("timerState").textContent = state.timerRunning ? "Focus session in progress" : (state.timerRemaining === state.timerMinutes * 60 ? "Ready to focus" : "Paused");
+      const stateMsg = state.timerRunning
+        ? (L.timerStateFocus ?? defaultLabels.timerStateFocus)
+        : (state.timerRemaining === state.timerMinutes * 60
+          ? (L.timerStateReady ?? defaultLabels.timerStateReady)
+          : (L.timerStatePaused ?? defaultLabels.timerStatePaused));
+      document.getElementById("timerState").textContent = stateMsg;
       const progress = 1 - (state.timerRemaining / (state.timerMinutes * 60));
       timerRing.style.strokeDashoffset = String(ringCircumference * (1 - progress));
-      document.getElementById("timerToggle").textContent = state.timerRunning ? "Pause Session" : "Start Session";
+      document.getElementById("timerToggle").textContent = state.timerRunning
+        ? (L.timerPauseLabel ?? defaultLabels.timerPauseLabel)
+        : (L.timerStartLabel ?? defaultLabels.timerStartLabel);
     }
 
     function setTimerMinutes(minutes) {
@@ -1125,8 +1919,9 @@
       state.timerRemaining = minutes * 60;
       state.timerRunning = false;
       saveState();
+      renderTimerHeaderChips();
       updateTimerUI();
-      showToast(`Timer set to ${minutes} minutes.`);
+      showToast(toastFmt("toastTimerSet", { minutes }));
     }
 
     function startTimer() {
@@ -1136,14 +1931,15 @@
         timerHandle = null;
         saveState();
         updateTimerUI();
-        showToast("Session paused.");
+        showToast(toastFmt("toastTimerPaused"));
         return;
       }
 
       state.timerRunning = true;
       saveState();
       updateTimerUI();
-      showToast("Focus session started.");
+      showToast(toastFmt("toastTimerStarted"));
+      let ticksUntilSave = 0;
       timerHandle = setInterval(() => {
         state.timerRemaining -= 1;
         if (state.timerRemaining <= 0) {
@@ -1151,21 +1947,28 @@
           state.timerRunning = false;
           clearInterval(timerHandle);
           timerHandle = null;
-          state.xp += 15;
-          state.sessions += 1;
+          const g = state.customization.game;
+          state.xp += g.xpPerTimer;
+          state.sessions += g.sessionsOnTimer;
           burstConfetti();
-          showToast("Session complete. Bonus XP awarded.");
-          while (state.xp >= LEVEL_XP) {
-            state.xp -= LEVEL_XP;
+          showToast(toastFmt("toastSessionComplete"));
+          const cap = getXpPerLevel();
+          while (state.xp >= cap) {
+            state.xp -= cap;
             state.level += 1;
             burstConfetti();
+            showToast(toastFmt("toastLevelUp", { level: state.level }));
           }
           saveState();
           render();
           updateTimerUI();
           return;
         }
-        saveState();
+        ticksUntilSave++;
+        if (ticksUntilSave >= 5) {
+          ticksUntilSave = 0;
+          saveState();
+        }
         updateTimerUI();
       }, 1000);
     }
@@ -1177,32 +1980,38 @@
       state.timerRemaining = state.timerMinutes * 60;
       saveState();
       updateTimerUI();
-      showToast("Timer reset.");
+      showToast(toastFmt("toastTimerReset"));
     }
 
     function animateQuote() {
       const box = document.getElementById("quoteBox");
+      if (!box || !state.customization.visible.showQuoteBox) return;
       box.classList.add("fade-out");
       clearTimeout(animateQuote._timer);
       animateQuote._timer = setTimeout(() => {
-        state.quoteIndex = (state.quoteIndex + 1) % quotes.length;
-        box.textContent = `\"${quotes[state.quoteIndex]}\"`;
+        const activeQuotes = getActiveQuotes();
+        state.quoteIndex = (state.quoteIndex + 1) % activeQuotes.length;
+        box.textContent = `\"${activeQuotes[state.quoteIndex]}\"`;
         box.classList.remove("fade-out");
         saveState();
       }, 220);
     }
 
     function renderLeaderboard() {
+      const me = state.customization.game.playerName || defaultCustomization.game.playerName;
+      const suffix = labelText("leaderStreakSuffix", defaultLabels.leaderStreakSuffix);
+      const youTag = labelText("leaderYouTag", defaultLabels.leaderYouTag);
       const sorted = [...state.leaderboard].sort((a, b) => b.xp - a.xp);
       leaderboard.innerHTML = "";
       sorted.forEach((player, index) => {
         const row = document.createElement("div");
         row.className = `leader-row ${index < 3 ? "top3" : ""}`;
+        const youExtra = player.name === me ? ` (${escapeHtml(youTag)})` : "";
         row.innerHTML = `
           <div class="rank">${index + 1}</div>
           <div class="leader-copy">
-            <strong>${player.name}${player.name === "You" ? " (You)" : ""}</strong>
-            <span>${player.streak}-day streak</span>
+            <strong>${escapeHtml(player.name)}${youExtra}</strong>
+            <span>${escapeHtml(String(player.streak))}${escapeHtml(suffix)}</span>
           </div>
           <div class="leader-score">${player.xp} XP</div>
         `;
@@ -1211,11 +2020,26 @@
       document.getElementById("sessionValue").textContent = String(state.sessions).padStart(2, "0");
     }
 
+    function chartAxisLabels(view) {
+      const L = state.customization.labels;
+      const key = view === "hours" ? "chartAxisHours" : view === "streaks" ? "chartAxisStreaks" : "chartAxisXp";
+      const fallback = view === "hours" ? defaultLabels.chartAxisHours : view === "streaks" ? defaultLabels.chartAxisStreaks : defaultLabels.chartAxisXp;
+      const parts = String(L[key] || fallback).split(",").map((s) => s.trim()).filter(Boolean);
+      while (parts.length < 7) parts.push(String(parts.length + 1));
+      return parts.slice(0, 7);
+    }
+
     function renderChart(view = "hours") {
-      const labels = view === "hours" ? ["M", "T", "W", "T", "F", "S", "S"] : view === "streaks" ? ["1", "2", "3", "4", "5", "6", "7"] : ["10", "20", "30", "40", "50", "60", "70"];
-      const values = insights[view];
-      const colors = view === "hours" ? ["#2de2e6", "#34d399", "#8d5cff", "#ff6b6b", "#b7f34c", "#ffc857", "#2de2e6"] : view === "streaks" ? ["#8d5cff", "#2de2e6", "#ff6b6b", "#ffc857", "#b7f34c", "#2de2e6", "#8d5cff"] : ["#ff6b6b", "#ffc857", "#2de2e6", "#34d399", "#8d5cff", "#b7f34c", "#ff6b6b"];
-      const max = Math.max(...values);
+      const ins = state.customization.insights || defaultInsights;
+      const values = ins[view] || defaultInsights[view];
+      const labels = chartAxisLabels(view);
+      const pal = state.customization.colors;
+      const colors = view === "hours"
+        ? [pal.teal, "#34d399", pal.purple, pal.coral, pal.lime, pal.gold, pal.teal]
+        : view === "streaks"
+          ? [pal.purple, pal.teal, pal.coral, pal.gold, pal.lime, pal.teal, pal.purple]
+          : [pal.coral, pal.gold, pal.teal, "#34d399", pal.purple, pal.lime, pal.coral];
+      const max = Math.max(...values, 1);
       chart.innerHTML = "";
       values.forEach((value, index) => {
         const item = document.createElement("div");
@@ -1223,10 +2047,11 @@
         const height = `${Math.max(18, Math.round((value / max) * 140))}px`;
         item.style.setProperty("--h", height);
         item.style.setProperty("--color", colors[index]);
-        item.innerHTML = `<div class="fill"></div><small>${labels[index]}</small>`;
+        item.innerHTML = `<div class="fill"></div><small>${escapeHtml(labels[index])}</small>`;
         chart.appendChild(item);
       });
-      document.getElementById("chartNote").textContent = view === "hours" ? "Weekly study hours are trending upward." : view === "streaks" ? "Streak consistency is becoming stronger." : "XP growth is compounding with each session.";
+      const noteKey = view === "hours" ? "chartNoteHours" : view === "streaks" ? "chartNoteStreaks" : "chartNoteXp";
+      document.getElementById("chartNote").textContent = labelText(noteKey, defaultLabels[noteKey]);
     }
 
     function render() {
@@ -1237,10 +2062,12 @@
       renderLeaderboard();
       renderChart(document.querySelector(".tab.active")?.dataset.view || "hours");
       const quoteBox = document.getElementById("quoteBox");
-      quoteBox.textContent = `\"${quotes[state.quoteIndex % quotes.length]}\"`;
+      const activeQuotes = getActiveQuotes();
+      quoteBox.textContent = `\"${activeQuotes[state.quoteIndex % activeQuotes.length]}\"`;
       document.getElementById("streakPill").classList.toggle("streak-glow", state.streak > 0);
-      shell.classList.toggle("collapsed", state.collapsed);
+      shell.classList.toggle("collapsed", state.collapsed && state.customization.visible.showSidebar);
       sidebar.classList.toggle("collapsed", state.collapsed);
+      updateSectionVisibility();
     }
 
     function resizeCanvas() {
@@ -1253,8 +2080,13 @@
     }
 
     function burstConfetti() {
+      const ef = state.customization.effects;
+      if (!ef.confettiEnabled) return;
       resizeCanvas();
-      const particles = Array.from({ length: 140 }, () => ({
+      const pal = state.customization.colors;
+      const palette = [pal.teal, pal.purple, pal.coral, pal.lime, pal.gold];
+      const n = Math.max(20, Math.min(300, ef.confettiParticles || 140));
+      const particles = Array.from({ length: n }, () => ({
         x: window.innerWidth * (0.25 + Math.random() * 0.5),
         y: window.innerHeight * 0.22 + Math.random() * 30,
         vx: (Math.random() - 0.5) * 8,
@@ -1262,7 +2094,7 @@
         size: Math.random() * 7 + 4,
         spin: Math.random() * 0.2 - 0.1,
         rot: Math.random() * Math.PI,
-        color: ["#2de2e6", "#8d5cff", "#ff6b6b", "#b7f34c", "#ffc857"][Math.floor(Math.random() * 5)],
+        color: palette[Math.floor(Math.random() * palette.length)],
         life: 80 + Math.random() * 40
       }));
 
@@ -1293,6 +2125,51 @@
       }, 1800);
     }
 
+    function openSettings() {
+      populateCustomizationForm();
+      settingsOverlay.classList.add("show");
+      settingsOverlay.setAttribute("aria-hidden", "false");
+      settingsOpen = true;
+    }
+
+    function closeSettings() {
+      settingsOverlay.classList.remove("show");
+      settingsOverlay.setAttribute("aria-hidden", "true");
+      settingsOpen = false;
+    }
+
+    function commitCustomization(saveToStorage = true) {
+      const customization = collectCustomizationFromForm(customForm);
+      state.customization = {
+        ...state.customization,
+        ...customization,
+        colors: { ...state.customization.colors, ...customization.colors },
+        visible: { ...state.customization.visible, ...customization.visible },
+        game: { ...state.customization.game, ...customization.game },
+        effects: { ...state.customization.effects, ...customization.effects },
+        insights: customization.insights,
+        navItems: customization.navItems,
+        labels: { ...defaultLabels, ...customization.labels },
+        quotes: customization.quotes.length ? customization.quotes : structuredClone(defaultCustomization.quotes),
+        starterTasks: customization.starterTasks.length ? customization.starterTasks : structuredClone(defaultCustomization.starterTasks),
+        leaderboardSeed: customization.leaderboardSeed.length ? customization.leaderboardSeed : structuredClone(defaultCustomization.leaderboardSeed)
+      };
+      if (!state.customization.timerPresets.length) state.customization.timerPresets = structuredClone(defaultCustomization.timerPresets);
+      if (!Number.isFinite(state.customization.quoteInterval)) state.customization.quoteInterval = defaultCustomization.quoteInterval;
+      if (!state.customization.timerPresets.includes(state.timerMinutes)) {
+        state.timerMinutes = state.customization.timerPresets[0];
+        state.timerRemaining = state.timerMinutes * 60;
+      }
+      state.tasks = structuredClone(state.customization.starterTasks);
+      state.leaderboard = structuredClone(state.customization.leaderboardSeed);
+      state.quoteIndex = 0;
+      renderNav();
+      applyCustomization();
+      render();
+      setQuoteLoop();
+      if (saveToStorage) saveState();
+    }
+
     document.getElementById("collapseBtn").addEventListener("click", () => {
       state.collapsed = !state.collapsed;
       saveState();
@@ -1307,17 +2184,12 @@
     document.getElementById("timerToggle").addEventListener("click", startTimer);
     document.getElementById("timerReset").addEventListener("click", resetTimer);
 
-    document.querySelectorAll("[data-minutes]").forEach((button) => {
-      button.addEventListener("click", () => setTimerMinutes(Number(button.dataset.minutes)));
-    });
-
-    document.querySelectorAll(".nav-item").forEach((button) => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
-        button.classList.add("active");
-        const panel = document.getElementById(`${button.dataset.nav}Panel`);
-        if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+    document.getElementById("timerPanel").addEventListener("click", (event) => {
+      const chip = event.target.closest("#timerHeaderChips [data-minutes]");
+      if (!chip) return;
+      document.querySelectorAll("#timerHeaderChips .chip").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      setTimerMinutes(Number(chip.dataset.minutes));
     });
 
     document.querySelectorAll(".tab").forEach((button) => {
@@ -1328,13 +2200,51 @@
       });
     });
 
-    document.getElementById("settingsBtn").addEventListener("click", () => showToast("Settings wireframe action."));
+    document.getElementById("settingsBtn").addEventListener("click", openSettings);
+    document.getElementById("closeSettingsBtn").addEventListener("click", closeSettings);
+    settingsOverlay.addEventListener("click", (event) => {
+      if (event.target === settingsOverlay) closeSettings();
+    });
+
+    customForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      commitCustomization(true);
+      closeSettings();
+      showToast(toastFmt("toastSaved"));
+    });
+
+    document.getElementById("previewCustomBtn").addEventListener("click", () => {
+      commitCustomization(false);
+      showToast(toastFmt("toastPreview"));
+    });
+
+    document.getElementById("resetCustomBtn").addEventListener("click", () => {
+      state.customization = structuredClone(defaultCustomization);
+      state.tasks = structuredClone(defaultCustomization.starterTasks);
+      state.leaderboard = structuredClone(defaultCustomization.leaderboardSeed);
+      state.quoteIndex = 0;
+      state.timerMinutes = defaultState.timerMinutes;
+      state.timerRemaining = defaultState.timerMinutes * 60;
+      populateCustomizationForm();
+      renderNav();
+      applyCustomization();
+      render();
+      setQuoteLoop();
+      saveState();
+      showToast(toastFmt("toastDefaultsRestored"));
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && settingsOpen) closeSettings();
+    });
 
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
+    renderNav();
+    applyCustomization();
     render();
-    quoteHandle = setInterval(animateQuote, 6500);
+    setQuoteLoop();
   </script>
 </body>
 </html>
