@@ -719,6 +719,19 @@
 
     .toast.show { opacity: 1; transform: translateY(0); }
 
+    .app-footer {
+      padding: 20px 22px 32px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(7, 17, 31, 0.5);
+    }
+
+    .app-footer p {
+      margin: 0 0 12px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
     .overlay {
       position: fixed;
       inset: 0;
@@ -931,7 +944,7 @@
         </div>
 
         <div class="field">
-          <label for="leaderboardInput">Leaderboard rows</label>
+          <label for="leaderboardInput">Leaderboard template (settings only; live board uses saved students)</label>
           <textarea id="leaderboardInput" name="leaderboard" placeholder="Name | XP | Streak"></textarea>
         </div>
 
@@ -1034,6 +1047,38 @@
     </div>
   </div>
 
+  <div class="overlay" id="profileOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="profileTitle">Your details</h2>
+          <p id="profileSub">Enter your name before adding tasks. Everyone who signs in appears on the leaderboard ranked by level and XP.</p>
+        </div>
+        <button type="button" class="icon-btn" id="closeProfileBtn" aria-label="Close" hidden>✕</button>
+      </div>
+      <form id="profileForm">
+        <div class="modal-grid">
+          <div class="field">
+            <label for="profileNameInput">Full name <span style="color:var(--coral)">*</span></label>
+            <input id="profileNameInput" name="displayName" type="text" required autocomplete="name" placeholder="e.g. Alex Kumar" />
+          </div>
+          <div class="field">
+            <label for="profileEmailInput">Email (optional)</label>
+            <input id="profileEmailInput" name="email" type="email" autocomplete="email" placeholder="you@school.edu" />
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label for="profileClassInput">Class / roll no. (optional)</label>
+            <input id="profileClassInput" name="studentClass" type="text" autocomplete="off" placeholder="e.g. 10-A / 24" />
+          </div>
+        </div>
+        <div class="modal-actions" style="flex-wrap:wrap;justify-content:space-between">
+          <button type="button" class="ghost" id="registerOtherStudentBtn">Someone else? New student</button>
+          <button type="submit" class="cta" id="profileSaveBtn">Save and continue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="app">
     <header class="topbar">
       <div class="brand">
@@ -1052,8 +1097,14 @@
       </div>
 
       <div class="profile-area">
-        <div class="avatar" id="miniAvatar">L4</div>
-        <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:0">
+          <span id="headerPlayerName" style="font-size:0.78rem;color:var(--muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="avatar" id="miniAvatar">?</div>
+            <button type="button" class="ghost" id="editProfileBtn" style="padding:8px 12px;font-size:0.8rem" title="Edit your details">Profile</button>
+            <button type="button" class="icon-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -1100,6 +1151,9 @@
               <div class="row">
                 <input id="taskInput" placeholder="Add a study task" />
                 <button type="button" class="cta" id="addTaskBtn">Add Task</button>
+              </div>
+              <div class="row" style="margin-top:4px">
+                <button type="button" class="ghost" id="resetTasksBtn" style="flex:1">Reset tasks</button>
               </div>
               <div class="task-list" id="taskList"></div>
             </div>
@@ -1216,10 +1270,16 @@
         </section>
       </section>
     </main>
+
+    <footer class="app-footer">
+      <p>Need to start over? This clears all saved students, tasks, progress, and settings on this browser.</p>
+      <button type="button" class="ghost" id="resetAllDataBtn" style="border-color:rgba(255,107,107,0.35);color:#ffb4b4">Reset everything</button>
+    </footer>
   </div>
 
   <script>
-    const STORAGE_KEY = "habitquest-dashboard-v1";
+    const STORAGE_KEY = "habitquest-dashboard-v2";
+    const LEGACY_STORAGE_KEY = "habitquest-dashboard-v1";
     const quotes = [
       "Small wins compound into big results. Finish the next task.",
       "Focus for 25 minutes now, enjoy future-you later.",
@@ -1283,7 +1343,7 @@
       tabXp: "XP Growth",
       leaderTitle: "Leaderboard Panel",
       leaderSub: "Position changes animate as rankings update.",
-      leaderFootnote: "Top 3 students get a highlighted glow for fast scanning.",
+      leaderFootnote: "Ranks use level first, then XP. Only saved student names appear here.",
       levelPrefix: "Level",
       levelBannerLow: "Your avatar is evolving with every level.",
       levelBannerHigh: "Elite scholar mode unlocked.",
@@ -1327,18 +1387,10 @@
       timerPresets: [25, 15, 45],
       quoteInterval: 6500,
       quotes: quotes,
-      starterTasks: [
-        { title: "Review biology notes", detail: "15 min recap before dinner", completed: true },
-        { title: "Solve algebra problems", detail: "Aim for 10 focused questions", completed: true },
-        { title: "Read history chapter", detail: "Highlight key dates and events", completed: true },
-        { title: "Write reflection journal", detail: "One paragraph about progress", completed: false }
-      ],
+      starterTasks: [],
       leaderboardSeed: [
-        { name: "Maya", xp: 164, streak: 18 },
-        { name: "You", xp: 164, streak: 12 },
-        { name: "Arjun", xp: 141, streak: 16 },
-        { name: "Leah", xp: 122, streak: 10 },
-        { name: "Noah", xp: 108, streak: 9 }
+        { name: "Example: Maya", xp: 0, streak: 0 },
+        { name: "Example: Jordan", xp: 0, streak: 0 }
       ],
       game: {
         xpPerLevel: 100,
@@ -1373,25 +1425,29 @@
     };
 
     const defaultState = {
-      level: 4,
-      xp: 64,
-      streak: 12,
-      sessions: 8,
+      level: 1,
+      xp: 0,
+      streak: 0,
+      sessions: 0,
+      students: [],
+      currentStudentId: null,
       collapsed: false,
       timerMinutes: 25,
       timerRemaining: 25 * 60,
       timerRunning: false,
       quoteIndex: 0,
       customization: defaultCustomization,
-      tasks: structuredClone(defaultCustomization.starterTasks),
-      leaderboard: structuredClone(defaultCustomization.leaderboardSeed)
+      tasks: []
     };
 
+    let useBackend = false;
     const state = loadState();
     let timerHandle = null;
     let quoteHandle = null;
     let confettiHandle = null;
     let settingsOpen = false;
+    let profileOpen = false;
+    let profileModalRequired = false;
 
     const shell = document.getElementById("shell");
     const sidebar = document.getElementById("sidebar");
@@ -1408,13 +1464,17 @@
     const appSubtitleEl = document.getElementById("appSubtitle");
     const settingsOverlay = document.getElementById("settingsOverlay");
     const customForm = document.getElementById("customForm");
+    const profileOverlay = document.getElementById("profileOverlay");
+    const profileForm = document.getElementById("profileForm");
 
     timerRing.style.strokeDasharray = ringCircumference;
     timerRing.style.strokeDashoffset = ringCircumference;
 
     function loadState() {
       try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || {};
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+        const saved = JSON.parse(raw || "null") || {};
         const merged = structuredClone(defaultState);
         Object.assign(merged, saved);
         const base = structuredClone(defaultCustomization);
@@ -1435,15 +1495,197 @@
           labels: { ...base.labels, ...(sc.labels || {}) },
           timerPresets: sc.timerPresets || base.timerPresets,
           quotes: sc.quotes || base.quotes,
-          starterTasks: sc.starterTasks || base.starterTasks,
+          starterTasks: Array.isArray(sc.starterTasks) ? sc.starterTasks : base.starterTasks,
           leaderboardSeed: sc.leaderboardSeed || base.leaderboardSeed
         };
-        merged.tasks = saved.tasks || merged.customization.starterTasks;
-        merged.leaderboard = saved.leaderboard || merged.customization.leaderboardSeed;
+        merged.students = Array.isArray(saved.students) ? saved.students : [];
+        merged.currentStudentId = saved.currentStudentId || null;
+        if (!merged.students.length && Array.isArray(saved.leaderboard) && saved.leaderboard.length) {
+          merged.students = saved.leaderboard.map((row, i) => ({
+            id: `migrated-${i}`,
+            name: String(row.name || "Student"),
+            email: "",
+            className: "",
+            level: 1,
+            xp: Math.max(0, Number(row.xp) || 0),
+            streak: Math.max(0, Number(row.streak) || 0),
+            sessions: 0
+          }));
+        }
+        if (!merged.students.length) {
+          const lv = Number(saved.level);
+          const xp = Number(saved.xp);
+          const st = Number(saved.streak);
+          const ses = Number(saved.sessions);
+          const hasProgress = (Number.isFinite(lv) && lv > 1) || (Number.isFinite(xp) && xp > 0) || (Number.isFinite(st) && st > 0) || (Number.isFinite(ses) && ses > 0);
+          if (hasProgress) {
+            const id = crypto.randomUUID();
+            const nm = String(merged.customization.game?.playerName || "You");
+            merged.students.push({
+              id,
+              name: nm,
+              email: "",
+              className: "",
+              level: Number.isFinite(lv) && lv >= 1 ? lv : 1,
+              xp: Number.isFinite(xp) && xp >= 0 ? xp : 0,
+              streak: Number.isFinite(st) && st >= 0 ? st : 0,
+              sessions: Number.isFinite(ses) && ses >= 0 ? ses : 0
+            });
+            merged.currentStudentId = id;
+          }
+        }
+        merged.tasks = Array.isArray(saved.tasks) ? saved.tasks : structuredClone(merged.customization.starterTasks);
+        if (merged.currentStudentId) {
+          const st = merged.students.find((s) => s.id === merged.currentStudentId);
+          if (st) {
+            merged.level = Number(st.level) || 1;
+            merged.xp = Math.max(0, Number(st.xp) || 0);
+            merged.streak = Math.max(0, Number(st.streak) || 0);
+            merged.sessions = Math.max(0, Number(st.sessions) || 0);
+            merged.customization.game.playerName = st.name || merged.customization.game.playerName;
+          }
+        }
         return merged;
       } catch {
         return structuredClone(defaultState);
       }
+    }
+
+    function mergeCustomization(base, patch) {
+      if (!patch || typeof patch !== "object") return structuredClone(base);
+      return {
+        ...base,
+        ...patch,
+        colors: { ...base.colors, ...(patch.colors || {}) },
+        game: { ...base.game, ...(patch.game || {}) },
+        effects: { ...base.effects, ...(patch.effects || {}) },
+        visible: { ...base.visible, ...(patch.visible || {}) },
+        insights: patch.insights
+          ? {
+              hours: patch.insights.hours ?? base.insights.hours,
+              streaks: patch.insights.streaks ?? base.insights.streaks,
+              xp: patch.insights.xp ?? base.insights.xp
+            }
+          : base.insights,
+        labels: { ...base.labels, ...(patch.labels || {}) },
+        navItems: patch.navItems?.length ? patch.navItems : base.navItems,
+        quotes: patch.quotes || base.quotes,
+        starterTasks: Array.isArray(patch.starterTasks) ? patch.starterTasks : base.starterTasks,
+        leaderboardSeed: patch.leaderboardSeed || base.leaderboardSeed
+      };
+    }
+
+    function applyServerStudentToState(s) {
+      if (!s || !s.id) return;
+      state.level = Number(s.level) || 1;
+      state.xp = Math.max(0, Number(s.xp) || 0);
+      state.streak = Math.max(0, Number(s.streak) || 0);
+      state.sessions = Math.max(0, Number(s.sessions) || 0);
+      if (Array.isArray(s.tasks)) state.tasks = structuredClone(s.tasks);
+      state.collapsed = !!s.collapsed;
+      state.timerMinutes = Number(s.timerMinutes) > 0 ? Number(s.timerMinutes) : 25;
+      state.timerRemaining = Number.isFinite(s.timerRemaining) ? s.timerRemaining : state.timerMinutes * 60;
+      state.timerRunning = !!s.timerRunning;
+      state.quoteIndex = Number(s.quoteIndex) || 0;
+      if (s.customization && typeof s.customization === "object") {
+        state.customization = mergeCustomization(defaultCustomization, s.customization);
+      }
+      const row = {
+        id: s.id,
+        name: s.name,
+        email: s.email ?? "",
+        className: s.className ?? "",
+        level: state.level,
+        xp: state.xp,
+        streak: state.streak,
+        sessions: state.sessions
+      };
+      const idx = state.students.findIndex((x) => x.id === s.id);
+      if (idx >= 0) state.students[idx] = { ...state.students[idx], ...row };
+      else state.students.push(row);
+      state.currentStudentId = s.id;
+      state.customization.game.playerName = s.name;
+    }
+
+    async function checkApiHealth() {
+      try {
+        const r = await fetch("/api/health", { method: "GET", cache: "no-store" });
+        return r.ok;
+      } catch {
+        return false;
+      }
+    }
+
+    async function refreshLeaderboardFromApi() {
+      if (!useBackend) return;
+      const r = await fetch("/api/students");
+      if (!r.ok) return;
+      const { students } = await r.json();
+      const byId = new Map(state.students.map((x) => [x.id, { ...x }]));
+      state.students = students.map((pub) => {
+        const prev = byId.get(pub.id);
+        return {
+          id: pub.id,
+          name: pub.name,
+          email: prev?.email ?? "",
+          className: prev?.className ?? "",
+          level: pub.level,
+          xp: pub.xp,
+          streak: pub.streak ?? 0,
+          sessions: pub.sessions ?? 0
+        };
+      });
+    }
+
+    async function hydrateFromApi() {
+      const IS_HTTP = location.protocol === "http:" || location.protocol === "https:";
+      if (!IS_HTTP) return;
+      const ok = await checkApiHealth();
+      useBackend = ok;
+      if (!useBackend) return;
+      try {
+        await refreshLeaderboardFromApi();
+        if (state.currentStudentId) {
+          const sr = await fetch("/api/students/" + encodeURIComponent(state.currentStudentId));
+          if (sr.ok) {
+            const { student } = await sr.json();
+            applyServerStudentToState(student);
+          } else {
+            state.currentStudentId = null;
+          }
+        }
+        render();
+        setQuoteLoop();
+        if (!state.currentStudentId) {
+          profileModalRequired = true;
+          openProfileModal(true);
+        }
+      } catch (e) {
+        console.warn("API hydrate failed", e);
+        useBackend = false;
+      }
+    }
+
+    function buildStudentPayload() {
+      syncCurrentStudent();
+      const st = getCurrentStudent();
+      if (!st) return null;
+      return {
+        name: st.name,
+        email: st.email ?? "",
+        className: st.className ?? "",
+        level: state.level,
+        xp: state.xp,
+        streak: state.streak,
+        sessions: state.sessions,
+        tasks: state.tasks,
+        collapsed: state.collapsed,
+        timerMinutes: state.timerMinutes,
+        timerRemaining: state.timerRemaining,
+        timerRunning: state.timerRunning,
+        quoteIndex: state.quoteIndex,
+        customization: state.customization
+      };
     }
 
     function parseTaskLines(value) {
@@ -1579,7 +1821,7 @@
       form.streakPerTask.value = g.streakPerTask;
       form.sessionsOnTask.value = g.sessionsOnTask;
       form.sessionsOnTimer.value = g.sessionsOnTimer;
-      form.playerName.value = g.playerName;
+      form.playerName.value = getCurrentStudent()?.name || g.playerName;
       form.confettiEnabled.checked = ef.confettiEnabled;
       form.quoteRotationEnabled.checked = ef.quoteRotationEnabled;
       form.confettiParticles.value = ef.confettiParticles;
@@ -1764,15 +2006,193 @@
       quoteHandle = setInterval(animateQuote, clamp(c.quoteInterval, 2000, 30000));
     }
 
+    saveState._apiTimer = null;
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      try {
+        syncCurrentStudent();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (_) {}
+      if (!useBackend || !state.currentStudentId) return;
+      clearTimeout(saveState._apiTimer);
+      saveState._apiTimer = setTimeout(() => {
+        void (async () => {
+          try {
+            const payload = buildStudentPayload();
+            if (!payload) return;
+            const r = await fetch(`/api/students/${encodeURIComponent(state.currentStudentId)}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+            if (r.ok) await refreshLeaderboardFromApi();
+          } catch (e) {
+            console.warn("API sync failed", e);
+          }
+        })();
+      }, 400);
     }
 
     window.addEventListener("beforeunload", () => {
       try {
+        syncCurrentStudent();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (_) {}
+      if (useBackend && state.currentStudentId) {
+        try {
+          const payload = buildStudentPayload();
+          if (payload) {
+            fetch(`/api/students/${encodeURIComponent(state.currentStudentId)}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+              keepalive: true
+            });
+          }
+        } catch (_) {}
+      }
     });
+
+    function getCurrentStudent() {
+      if (!state.currentStudentId) return null;
+      return state.students.find((s) => s.id === state.currentStudentId) || null;
+    }
+
+    function syncCurrentStudent() {
+      if (!state.currentStudentId) return;
+      const i = state.students.findIndex((s) => s.id === state.currentStudentId);
+      if (i < 0) return;
+      const prev = state.students[i];
+      state.students[i] = {
+        ...prev,
+        level: state.level,
+        xp: state.xp,
+        streak: state.streak,
+        sessions: state.sessions,
+        name: prev.name,
+        email: prev.email ?? "",
+        className: prev.className ?? ""
+      };
+    }
+
+    function openProfileModal(required = false) {
+      profileModalRequired = required;
+      populateProfileForm();
+      profileOverlay.classList.add("show");
+      profileOverlay.setAttribute("aria-hidden", "false");
+      profileOpen = true;
+      document.getElementById("closeProfileBtn").hidden = required;
+      const sub = document.getElementById("profileSub");
+      if (sub) {
+        sub.textContent = useBackend
+          ? (required
+            ? "Enter your name before adding tasks. Profiles save to the server—everyone using this app URL shares one leaderboard (ranked by level, then XP)."
+            : "Update your details on the server.")
+          : (required
+            ? "Enter your name before adding tasks. For a shared class leaderboard, open this app from the server (run npm start in the server folder)."
+            : "Update your details. Leaderboard is local unless you use the server URL.");
+      }
+    }
+
+    function closeProfileModal() {
+      if (profileModalRequired) return;
+      profileOverlay.classList.remove("show");
+      profileOverlay.setAttribute("aria-hidden", "true");
+      profileOpen = false;
+    }
+
+    function populateProfileForm() {
+      const st = getCurrentStudent();
+      document.getElementById("profileNameInput").value = st?.name || "";
+      document.getElementById("profileEmailInput").value = st?.email || "";
+      document.getElementById("profileClassInput").value = st?.className || "";
+    }
+
+    async function submitProfileForm(event) {
+      event.preventDefault();
+      const name = document.getElementById("profileNameInput").value.trim();
+      if (!name) return;
+      const email = document.getElementById("profileEmailInput").value.trim();
+      const className = document.getElementById("profileClassInput").value.trim();
+      try {
+        if (useBackend && !state.currentStudentId) {
+          const r = await fetch("/api/students", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, className })
+          });
+          if (!r.ok) throw new Error("create failed");
+          const { student } = await r.json();
+          applyServerStudentToState(student);
+        } else if (useBackend && state.currentStudentId) {
+          const r = await fetch(`/api/students/${encodeURIComponent(state.currentStudentId)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, className })
+          });
+          if (!r.ok) throw new Error("update failed");
+          const body = await r.json();
+          applyServerStudentToState(body.student);
+          await refreshLeaderboardFromApi();
+        } else {
+          if (state.currentStudentId) {
+            const i = state.students.findIndex((s) => s.id === state.currentStudentId);
+            if (i >= 0) state.students[i] = { ...state.students[i], name, email, className };
+          } else {
+            const id = crypto.randomUUID();
+            state.students.push({
+              id,
+              name,
+              email,
+              className,
+              level: 1,
+              xp: 0,
+              streak: 0,
+              sessions: 0
+            });
+            state.currentStudentId = id;
+            state.level = 1;
+            state.xp = 0;
+            state.streak = 0;
+            state.sessions = 0;
+          }
+          state.customization.game.playerName = name;
+        }
+      } catch {
+        showToast("Server unreachable. Run npm start in server/ or use offline mode (open file locally).");
+        return;
+      }
+      profileModalRequired = false;
+      profileOverlay.classList.remove("show");
+      profileOverlay.setAttribute("aria-hidden", "true");
+      profileOpen = false;
+      saveState();
+      if (useBackend) await refreshLeaderboardFromApi();
+      render();
+      showToast("Profile saved.");
+    }
+
+    function applyXpFromTaskWithSingleLevelCap(xpGain) {
+      state.xp += xpGain;
+      const cap = getXpPerLevel();
+      let leveled = false;
+      if (state.xp >= cap) {
+        state.xp -= cap;
+        state.level += 1;
+        leveled = true;
+      }
+      return leveled;
+    }
+
+    function updateHeaderProfile() {
+      const st = getCurrentStudent();
+      const nameEl = document.getElementById("headerPlayerName");
+      if (nameEl) nameEl.textContent = st?.name ? st.name : "";
+      const av = document.getElementById("miniAvatar");
+      if (av) {
+        const letter = (st?.name || "?").trim().charAt(0).toUpperCase() || "?";
+        av.textContent = letter;
+      }
+    }
 
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
@@ -1807,7 +2227,6 @@
 
     function updateAvatar() {
       const badge = `L${state.level}`;
-      document.getElementById("miniAvatar").textContent = badge;
       document.getElementById("bigAvatar").textContent = badge;
       document.getElementById("levelValue").textContent = String(state.level).padStart(2, "0");
       const lp = labelText("levelPrefix", defaultLabels.levelPrefix);
@@ -1859,7 +2278,6 @@
 
     function toggleTask(index) {
       const g = state.customization.game;
-      const me = g.playerName || defaultCustomization.game.playerName;
       const task = state.tasks[index];
       if (task.completed) {
         showToast(toastFmt("toastTaskAlready"));
@@ -1867,25 +2285,26 @@
       }
 
       task.completed = true;
-      state.xp += g.xpPerTask;
       state.streak += g.streakPerTask;
       state.sessions += g.sessionsOnTask;
-      state.leaderboard = state.leaderboard.map((player) => player.name === me ? { ...player, xp: player.xp + g.xpPerTask, streak: state.streak } : player);
-
-      const cap = getXpPerLevel();
-      while (state.xp >= cap) {
-        state.xp -= cap;
-        state.level += 1;
+      const leveled = applyXpFromTaskWithSingleLevelCap(g.xpPerTask);
+      if (leveled) {
         burstConfetti();
         showToast(toastFmt("toastLevelUp", { level: state.level }));
       }
 
+      syncCurrentStudent();
       saveState();
       render();
       if (state.customization.visible.showQuoteBox) animateQuote();
     }
 
     function addTask() {
+      if (!state.currentStudentId) {
+        openProfileModal(true);
+        showToast("Add your name first, then you can add tasks.");
+        return;
+      }
       const input = document.getElementById("taskInput");
       const value = input.value.trim();
       if (!value) return;
@@ -1918,6 +2337,7 @@
       state.timerMinutes = minutes;
       state.timerRemaining = minutes * 60;
       state.timerRunning = false;
+      syncCurrentStudent();
       saveState();
       renderTimerHeaderChips();
       updateTimerUI();
@@ -1929,6 +2349,7 @@
         state.timerRunning = false;
         clearInterval(timerHandle);
         timerHandle = null;
+        syncCurrentStudent();
         saveState();
         updateTimerUI();
         showToast(toastFmt("toastTimerPaused"));
@@ -1959,6 +2380,7 @@
             burstConfetti();
             showToast(toastFmt("toastLevelUp", { level: state.level }));
           }
+          syncCurrentStudent();
           saveState();
           render();
           updateTimerUI();
@@ -1978,6 +2400,7 @@
       timerHandle = null;
       state.timerRunning = false;
       state.timerRemaining = state.timerMinutes * 60;
+      syncCurrentStudent();
       saveState();
       updateTimerUI();
       showToast(toastFmt("toastTimerReset"));
@@ -1998,22 +2421,23 @@
     }
 
     function renderLeaderboard() {
-      const me = state.customization.game.playerName || defaultCustomization.game.playerName;
-      const suffix = labelText("leaderStreakSuffix", defaultLabels.leaderStreakSuffix);
-      const youTag = labelText("leaderYouTag", defaultLabels.leaderYouTag);
-      const sorted = [...state.leaderboard].sort((a, b) => b.xp - a.xp);
+      const sorted = [...state.students].sort((a, b) => b.level - a.level || b.xp - a.xp);
       leaderboard.innerHTML = "";
-      sorted.forEach((player, index) => {
+      if (!sorted.length) {
+        leaderboard.innerHTML = `<div class="leader-note" style="text-align:center;padding:20px">No students yet. Save your details to appear here.</div>`;
+        document.getElementById("sessionValue").textContent = String(state.sessions).padStart(2, "0");
+        return;
+      }
+      const lp = labelText("levelPrefix", defaultLabels.levelPrefix);
+      sorted.forEach((student, index) => {
         const row = document.createElement("div");
         row.className = `leader-row ${index < 3 ? "top3" : ""}`;
-        const youExtra = player.name === me ? ` (${escapeHtml(youTag)})` : "";
         row.innerHTML = `
           <div class="rank">${index + 1}</div>
           <div class="leader-copy">
-            <strong>${escapeHtml(player.name)}${youExtra}</strong>
-            <span>${escapeHtml(String(player.streak))}${escapeHtml(suffix)}</span>
+            <strong>${escapeHtml(student.name)}</strong>
           </div>
-          <div class="leader-score">${player.xp} XP</div>
+          <div class="leader-score">${escapeHtml(lp)} ${student.level} · ${student.xp} XP</div>
         `;
         leaderboard.appendChild(row);
       });
@@ -2055,6 +2479,7 @@
     }
 
     function render() {
+      updateHeaderProfile();
       updateAvatar();
       updateXp();
       renderTasks();
@@ -2160,8 +2585,6 @@
         state.timerMinutes = state.customization.timerPresets[0];
         state.timerRemaining = state.timerMinutes * 60;
       }
-      state.tasks = structuredClone(state.customization.starterTasks);
-      state.leaderboard = structuredClone(state.customization.leaderboardSeed);
       state.quoteIndex = 0;
       renderNav();
       applyCustomization();
@@ -2220,8 +2643,9 @@
 
     document.getElementById("resetCustomBtn").addEventListener("click", () => {
       state.customization = structuredClone(defaultCustomization);
-      state.tasks = structuredClone(defaultCustomization.starterTasks);
-      state.leaderboard = structuredClone(defaultCustomization.leaderboardSeed);
+      const st = getCurrentStudent();
+      if (st) state.customization.game.playerName = st.name;
+      state.tasks = structuredClone(state.customization.starterTasks);
       state.quoteIndex = 0;
       state.timerMinutes = defaultState.timerMinutes;
       state.timerRemaining = defaultState.timerMinutes * 60;
@@ -2234,8 +2658,51 @@
       showToast(toastFmt("toastDefaultsRestored"));
     });
 
+    function resetTasksList() {
+      if (!confirm("Reset tasks to your starter list from settings (all unchecked)? Your progress and profile stay the same.")) return;
+      const starter = state.customization.starterTasks || [];
+      state.tasks = structuredClone(starter).map((t) => ({ ...t, completed: false }));
+      saveState();
+      render();
+      showToast("Tasks reset.");
+    }
+
+    function resetAllData() {
+      if (!confirm("Erase ALL data on this browser—every student, tasks, XP, levels, and settings?")) return;
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      } catch (_) {}
+      location.reload();
+    }
+
+    profileForm.addEventListener("submit", (e) => {
+      void submitProfileForm(e);
+    });
+    document.getElementById("closeProfileBtn").addEventListener("click", closeProfileModal);
+    document.getElementById("editProfileBtn").addEventListener("click", () => openProfileModal(false));
+    profileOverlay.addEventListener("click", (event) => {
+      if (event.target === profileOverlay && !profileModalRequired) closeProfileModal();
+    });
+    document.getElementById("registerOtherStudentBtn").addEventListener("click", () => {
+      state.currentStudentId = null;
+      state.level = 1;
+      state.xp = 0;
+      state.streak = 0;
+      state.sessions = 0;
+      state.tasks = [];
+      profileModalRequired = true;
+      populateProfileForm();
+      document.getElementById("closeProfileBtn").hidden = true;
+      showToast("Enter the new student’s name, then save.");
+    });
+
+    document.getElementById("resetTasksBtn").addEventListener("click", resetTasksList);
+    document.getElementById("resetAllDataBtn").addEventListener("click", resetAllData);
+
     window.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && settingsOpen) closeSettings();
+      if (event.key === "Escape" && profileOpen && !profileModalRequired) closeProfileModal();
     });
 
     window.addEventListener("resize", resizeCanvas);
@@ -2245,6 +2712,8 @@
     applyCustomization();
     render();
     setQuoteLoop();
+    if (!state.currentStudentId) openProfileModal(true);
+    void hydrateFromApi();
   </script>
 </body>
 </html>
