@@ -156,6 +156,20 @@ app.delete("/api/students/:id", async (req, res) => {
   }
 });
 
+/** Clears all server-side student data (used by “Reset everything” in the app). */
+app.post("/api/reset", async (req, res) => {
+  try {
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    if (body.confirm !== true) {
+      return res.status(400).json({ error: "Set confirm: true to clear all data" });
+    }
+    await writeDb({ students: [] });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: String(e.message) });
+  }
+});
+
 app.use(express.static(ROOT));
 
 app.listen(PORT, () => {

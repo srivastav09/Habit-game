@@ -1837,6 +1837,33 @@
       });
     }
 
+    /** After leaderboard refresh, re-attach current student if missing, or clear stale id. */
+    async function repairCurrentStudentAfterLeaderboard() {
+      if (!state.currentStudentId || !useBackend) return;
+      if (state.students.some((s) => s.id === state.currentStudentId)) return;
+      try {
+        const r = await fetch("/api/students/" + encodeURIComponent(state.currentStudentId), { cache: "no-store" });
+        if (r.ok) {
+          const { student } = await r.json();
+          state.students.push({
+            id: student.id,
+            name: student.name,
+            email: student.email ?? "",
+            className: student.className ?? "",
+            level: student.level ?? 1,
+            xp: student.xp ?? 0,
+            streak: student.streak ?? 0,
+            sessions: student.sessions ?? 0,
+            dayLog: student.dayLog && typeof student.dayLog === "object" ? structuredClone(student.dayLog) : {}
+          });
+        } else {
+          state.currentStudentId = null;
+        }
+      } catch {
+        state.currentStudentId = null;
+      }
+    }
+
     async function hydrateFromApi() {
       const IS_HTTP = location.protocol === "http:" || location.protocol === "https:";
       if (!IS_HTTP) return;
@@ -1845,6 +1872,7 @@
       if (!useBackend) return;
       try {
         await refreshLeaderboardFromApi();
+        await repairCurrentStudentAfterLeaderboard();
         if (state.currentStudentId) {
           const pushedOk = await syncStudentToServerNow();
           if (pushedOk) {
@@ -2240,7 +2268,21 @@
 
     /** Clears debounced sync and PUTs current state so server matches local (fixes reset/refresh races). */
     async function syncStudentToServerNow() {
-      if (!useBackend || !state.currentStudentId) return true;
+      const IS_HTTP = location.protocol === "http:" || location.protocol === "https:";
+      if (IS_HTTP) {
+        try {
+          useBackend = await checkApiHealth();
+        } catch (_) {
+          useBackend = false;
+        }
+      }
+      if (!useBackend || !state.currentStudentId) {
+        try {
+          syncCurrentStudent();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (_) {}
+        return true;
+      }
       clearTimeout(saveState._apiTimer);
       saveState._apiTimer = null;
       try {
@@ -2288,8 +2330,25 @@
       return state.students.find((s) => s.id === state.currentStudentId) || null;
     }
 
+    function ensureCurrentStudentInStudents() {
+      if (!state.currentStudentId) return;
+      if (state.students.some((s) => s.id === state.currentStudentId)) return;
+      state.students.push({
+        id: state.currentStudentId,
+        name: state.customization.game?.playerName || "You",
+        email: "",
+        className: "",
+        level: state.level,
+        xp: state.xp,
+        streak: state.streak,
+        sessions: state.sessions,
+        dayLog: {}
+      });
+    }
+
     function syncCurrentStudent() {
       if (!state.currentStudentId) return;
+      ensureCurrentStudentInStudents();
       const i = state.students.findIndex((s) => s.id === state.currentStudentId);
       if (i < 0) return;
       const prev = state.students[i];
@@ -3104,8 +3163,24 @@
       void syncStudentToServerNow();
     }
 
-    function resetAllData() {
-      if (!confirm("Erase ALL data on this browser—every student, tasks, XP, levels, and settings?")) return;
+    async function resetAllData() {
+      const IS_HTTP = location.protocol === "http:" || location.protocol === "https:";
+      const msg = IS_HTTP
+        ? "Erase ALL data in this browser AND on the server (shared leaderboard)? This cannot be undone."
+        : "Erase ALL data on this browser—every student, tasks, XP, levels, and settings?";
+      if (!confirm(msg)) return;
+      if (IS_HTTP) {
+        try {
+          const r = await fetch("/api/reset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ confirm: true })
+          });
+          if (!r.ok) console.warn("Server reset failed; clearing local data only.");
+        } catch (e) {
+          console.warn("Server reset offline; clearing local data only.", e);
+        }
+      }
       try {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -3136,7 +3211,9 @@
     });
 
     document.getElementById("resetTasksBtn").addEventListener("click", resetTasksList);
-    document.getElementById("resetAllDataBtn").addEventListener("click", resetAllData);
+    document.getElementById("resetAllDataBtn").addEventListener("click", () => {
+      void resetAllData();
+    });
 
     window.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && settingsOpen) closeSettings();
