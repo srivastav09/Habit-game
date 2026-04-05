@@ -1,227 +1,1340 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Habit Builder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HabitQuest</title>
   <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(12, 22, 41, 0.82);
+      --panel-strong: #0f1c33;
+      --line: rgba(173, 203, 255, 0.12);
+      --text: #eff5ff;
+      --muted: #9bb0d0;
+      --teal: #2de2e6;
+      --purple: #8d5cff;
+      --coral: #ff6b6b;
+      --lime: #b7f34c;
+      --gold: #ffc857;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --sidebar: 280px;
+      --sidebar-collapsed: 90px;
+      font-synthesis-weight: none;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #e3f2fd, #fce4ec);
-      padding: 15px;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(45, 226, 230, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(141, 92, 255, 0.16), transparent 28%),
+        radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.12), transparent 20%),
+        linear-gradient(135deg, #060c17, #0b1530 55%, #09111f);
+      font-family: "Poppins", "Roboto", "Segoe UI", system-ui, sans-serif;
+      overflow-x: hidden;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 5px;
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
     }
 
-    #stats {
-      text-align: center;
-      margin-bottom: 5px;
-      font-weight: bold;
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      backdrop-filter: blur(16px);
+      background: rgba(7, 17, 31, 0.72);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .bar-container {
-      background: #ddd;
-      border-radius: 10px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark, .avatar {
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      flex: 0 0 auto;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, var(--teal), var(--purple));
+      box-shadow: 0 0 28px rgba(45, 226, 230, 0.4);
+      font-weight: 800;
+      color: #09111f;
+    }
+
+    .brand-copy h1, .panel h2, .panel h3, .metric strong { margin: 0; }
+    .brand-copy h1 { font-size: 1.05rem; letter-spacing: 0.02em; }
+    .brand-copy p { margin: 2px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .streak-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border: 1px solid rgba(255, 200, 87, 0.3);
+      border-radius: 999px;
+      background: rgba(255, 200, 87, 0.08);
+      box-shadow: 0 0 32px rgba(255, 200, 87, 0.08);
+      justify-self: center;
+      white-space: nowrap;
+    }
+
+    .streak-pill .fire {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--gold);
+      box-shadow: 0 0 24px var(--gold);
+      animation: pulse 1.3s ease-in-out infinite;
+    }
+
+    .streak-value {
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .streak-glow {
+      box-shadow: 0 0 26px rgba(255, 200, 87, 0.35), inset 0 0 18px rgba(255, 200, 87, 0.1);
+    }
+
+    .profile-area {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--coral), var(--purple), var(--teal));
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06), 0 0 34px rgba(141, 92, 255, 0.24);
+      position: relative;
       overflow: hidden;
-      margin-bottom: 15px;
+      font-weight: 800;
     }
 
-    #xpBar {
-      height: 10px;
-      width: 0%;
-      background: linear-gradient(to right, #4caf50, #8bc34a);
-      transition: width 0.4s ease;
+    .avatar::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,0.18);
     }
 
-    input {
-      padding: 12px;
-      width: 100%;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
     }
 
-    button {
-      padding: 12px;
-      width: 100%;
-      border: none;
-      border-radius: 10px;
-      background: black;
-      color: white;
-      margin-bottom: 10px;
-      font-size: 16px;
-      transition: transform 0.2s, background 0.3s;
+    .icon-btn:hover, .nav-item:hover, .chip:hover, .task button:hover, .cta:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.16);
     }
 
-    button:active {
-      transform: scale(0.95);
+    .shell {
+      display: grid;
+      grid-template-columns: var(--sidebar) 1fr;
+      gap: 22px;
+      padding: 22px;
+      transition: grid-template-columns 220ms ease;
     }
 
-    .card {
-      background: white;
-      padding: 15px;
+    .shell.collapsed { grid-template-columns: var(--sidebar-collapsed) 1fr; }
+
+    .sidebar {
+      position: sticky;
+      top: 90px;
+      height: calc(100vh - 112px);
+      padding: 18px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: padding 220ms ease;
+    }
+
+    .sidebar-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-title strong { font-size: 1rem; }
+    .sidebar-title span { font-size: 0.82rem; color: var(--muted); }
+
+    .nav {
+      display: grid;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(45, 226, 230, 0.18), rgba(141, 92, 255, 0.2));
+      border-color: rgba(141, 92, 255, 0.35);
+      box-shadow: 0 0 30px rgba(141, 92, 255, 0.08);
+    }
+
+    .nav-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      color: var(--teal);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      flex: 0 0 auto;
+    }
+
+    .nav-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .nav-label strong { font-size: 0.95rem; }
+    .nav-label span { font-size: 0.8rem; color: var(--muted); }
+
+    .sidebar.collapsed .sidebar-title,
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .collapse-copy,
+    .shell.collapsed .sidebar-title,
+    .shell.collapsed .nav-label,
+    .shell.collapsed .collapse-copy {
+      display: none;
+    }
+
+    .sidebar.collapsed .nav-item, .shell.collapsed .nav-item {
+      justify-content: center;
+      padding-inline: 10px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(45, 226, 230, 0.12), rgba(255, 107, 107, 0.08));
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sidebar-footer .collapse-copy { color: var(--muted); font-size: 0.86rem; margin-top: 6px; }
+
+    .content {
+      display: grid;
+      gap: 22px;
+      align-content: start;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      min-height: 112px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric::before {
+      content: "";
+      position: absolute;
+      inset: auto -12% -18% auto;
+      width: 90px;
+      height: 90px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(45, 226, 230, 0.2), transparent 68%);
+      filter: blur(2px);
+    }
+
+    .metric small { display: block; color: var(--muted); font-size: 0.8rem; margin-bottom: 8px; }
+    .metric strong { font-size: 1.9rem; letter-spacing: -0.03em; }
+    .metric .sub { color: var(--muted); font-size: 0.84rem; margin-top: 6px; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: 22px;
+    }
+
+    .grid-2.equal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .panel {
+      padding: 20px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      animation: rise 420ms ease both;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .panel-header p, .panel-subtitle, .helper, .task-meta, .quote, .leader-note {
+      color: var(--muted);
+    }
+
+    .panel-header p { margin: 4px 0 0; font-size: 0.88rem; }
+
+    .panel-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .chip, .tab, .cta, .task button, .ghost {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-radius: 14px;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    }
+
+    .chip, .tab {
+      padding: 10px 14px;
+      font-weight: 700;
+    }
+
+    .chip.active, .tab.active {
+      background: linear-gradient(135deg, rgba(45, 226, 230, 0.15), rgba(141, 92, 255, 0.18));
+      border-color: rgba(141, 92, 255, 0.4);
+    }
+
+    .task-tools {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .task-tools .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .task-tools input {
+      flex: 1;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      padding: 13px 14px;
+      border-radius: 16px;
+      outline: none;
+    }
+
+    .task-tools input::placeholder { color: #7287aa; }
+
+    .task-tools input:focus { border-color: rgba(45, 226, 230, 0.45); }
+
+    .cta, .ghost {
+      padding: 12px 15px;
+      font-weight: 700;
+    }
+
+    .cta {
+      background: linear-gradient(135deg, var(--teal), var(--purple));
+      color: #06111f;
+      border-color: transparent;
+      box-shadow: 0 12px 30px rgba(45, 226, 230, 0.18);
+    }
+
+    .ghost { background: rgba(255,255,255,0.03); }
+
+    .task-list {
+      display: grid;
+      gap: 10px;
       margin-top: 10px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      animation: fadeIn 0.4s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .task {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
     }
 
-    .delete-btn {
-      background: #e53935;
+    .task.completed {
+      background: rgba(183, 243, 76, 0.08);
+      border-color: rgba(183, 243, 76, 0.22);
     }
 
-    canvas {
-      width: 100%;
+    .check {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: grid;
+      place-items: center;
+      font-size: 0.72rem;
+      color: #06111f;
+      background: transparent;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .task.completed .check {
+      background: linear-gradient(135deg, var(--lime), var(--gold));
+      border-color: transparent;
+      transform: scale(1.05);
+    }
+
+    .task-copy strong { display: block; margin-bottom: 3px; }
+    .task-copy span { font-size: 0.82rem; color: var(--muted); }
+
+    .task button {
+      padding: 10px 12px;
+      white-space: nowrap;
+    }
+
+    .task.completed button {
+      background: rgba(183, 243, 76, 0.14);
+      color: var(--lime);
+    }
+
+    .bar-shell {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .bar {
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .bar > span {
+      display: block;
       height: 100%;
+      border-radius: inherit;
+      width: 0%;
+      background: linear-gradient(90deg, var(--teal), var(--purple), var(--coral), var(--lime));
+      box-shadow: 0 0 24px rgba(45, 226, 230, 0.28);
+      transition: width 500ms cubic-bezier(.2,.7,.1,1);
+    }
+
+    .timer-layout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .ring {
+      width: min(34vw, 260px);
+      aspect-ratio: 1;
+      position: relative;
+      display: grid;
+      place-items: center;
+      margin-inline: auto;
+      filter: drop-shadow(0 0 32px rgba(45, 226, 230, 0.12));
+    }
+
+    .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+    .ring .timebox {
+      position: absolute;
+      inset: 24%;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+
+    .timebox strong {
+      display: block;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -0.05em;
+    }
+
+    .timebox span { color: var(--muted); font-size: 0.8rem; }
+
+    .timer-copy { display: grid; gap: 12px; }
+
+    .timer-controls, .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .timer-controls button, .preset-row button { padding: 12px 14px; min-width: 112px; }
+
+    .focus-note {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(45, 226, 230, 0.08);
+      border: 1px solid rgba(45, 226, 230, 0.16);
+      color: #d7fbfc;
+    }
+
+    .progress-hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .progress-copy {
+      display: grid;
+      gap: 14px;
+    }
+
+    .quote {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      min-height: 78px;
+      display: grid;
+      align-items: center;
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .quote.fade-out { opacity: 0; transform: translateY(8px); }
+
+    .avatar-stage {
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      border-radius: 24px;
+      min-height: 170px;
+      background: radial-gradient(circle at top, rgba(141, 92, 255, 0.18), rgba(45, 226, 230, 0.06));
+      border: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+
+    .avatar-big {
+      width: 104px;
+      height: 104px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--teal), var(--purple), var(--coral));
+      box-shadow: 0 0 34px rgba(141, 92, 255, 0.28);
+      margin-bottom: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #08111f;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar-big::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .level-banner { font-size: 0.82rem; color: var(--muted); }
+
+    .insights-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .chart-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .chart {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      align-items: end;
+      gap: 12px;
+      min-height: 180px;
+      padding: 14px 8px 8px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .bar-item {
+      display: grid;
+      gap: 8px;
+      align-items: end;
+      justify-items: center;
+    }
+
+    .bar-item .fill {
+      width: 100%;
+      border-radius: 18px 18px 10px 10px;
+      min-height: 18px;
+      height: var(--h);
+      background: linear-gradient(180deg, var(--color), rgba(255,255,255,0.16));
+      box-shadow: 0 0 18px color-mix(in srgb, var(--color) 45%, transparent);
+      transform-origin: bottom;
+      transition: height 520ms cubic-bezier(.2,.7,.1,1), opacity 240ms ease;
+      animation: grow 600ms ease both;
+    }
+
+    .bar-item small { color: var(--muted); font-size: 0.75rem; }
+
+    .leaderboard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .leader-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+    }
+
+    .leader-row.top3 {
+      background: linear-gradient(135deg, rgba(255, 200, 87, 0.12), rgba(141, 92, 255, 0.1));
+      border-color: rgba(255, 200, 87, 0.22);
+      box-shadow: 0 0 26px rgba(255, 200, 87, 0.07);
+    }
+
+    .rank {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.08);
+      font-weight: 800;
+    }
+
+    .leader-copy strong { display: block; }
+    .leader-copy span { color: var(--muted); font-size: 0.82rem; }
+    .leader-score { font-weight: 800; }
+
+    .leader-note { margin-top: 12px; font-size: 0.84rem; }
+
+    .hidden { display: none !important; }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 60;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(10, 18, 34, 0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 220ms ease, transform 220ms ease;
+      max-width: min(92vw, 320px);
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes grow { from { height: 12px; opacity: 0.6; } to { opacity: 1; } }
+    @keyframes pulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 200, 87, 0.4); } 50% { transform: scale(1.08); box-shadow: 0 0 32px rgba(255, 200, 87, 0.75); } }
+
+    @media (max-width: 1160px) {
+      .hero { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-2, .progress-hero, .timer-layout { grid-template-columns: 1fr; }
+      .sidebar { position: relative; top: 0; height: auto; }
+      .shell { grid-template-columns: 1fr; }
+      .shell.collapsed { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .topbar { grid-template-columns: 1fr; justify-items: stretch; }
+      .streak-pill, .profile-area { justify-self: stretch; justify-content: space-between; }
+      .hero { grid-template-columns: 1fr; }
+      .task, .leader-row { grid-template-columns: 1fr; justify-items: start; }
+      .task button, .timer-controls button, .preset-row button { width: 100%; }
+      .panel, .metric, .sidebar { border-radius: 20px; }
+      .content, .shell { padding: 14px; gap: 14px; }
+      .topbar { padding: 14px; }
+      .ring { width: min(78vw, 250px); }
     }
   </style>
 </head>
-
 <body>
+  <canvas id="confettiCanvas"></canvas>
+  <div class="toast" id="toast"></div>
 
-<canvas id="confettiCanvas" style="position:fixed; top:0; left:0; pointer-events:none;"></canvas>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">HQ</div>
+        <div class="brand-copy">
+          <h1>HabitQuest</h1>
+          <p>Student habit game dashboard</p>
+        </div>
+      </div>
 
-<h1>Habit Builder 🎯</h1>
+      <div class="streak-pill" id="streakPill">
+        <span class="fire"></span>
+        <div>
+          <div class="streak-value"><span id="streakValue">12</span>-day streak</div>
+        </div>
+      </div>
 
-<div id="stats"></div>
+      <div class="profile-area">
+        <div class="avatar" id="miniAvatar">L4</div>
+        <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+      </div>
+    </header>
 
-<div class="bar-container">
-  <div id="xpBar"></div>
-</div>
+    <main class="shell" id="shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+          <div class="sidebar-title">
+            <strong>Navigation</strong>
+            <span>Quick access</span>
+          </div>
+          <button class="icon-btn" id="collapseBtn" aria-label="Collapse sidebar">☰</button>
+        </div>
 
-<input id="habitInput" placeholder="Enter habit">
-<button onclick="addHabit()">Add Habit</button>
+        <nav class="nav">
+          <button class="nav-item active" data-nav="tasks"><span class="nav-icon">ST</span><span class="nav-label"><strong>Study Tasks</strong><span>Daily checklist</span></span></button>
+          <button class="nav-item" data-nav="timer"><span class="nav-icon">FT</span><span class="nav-label"><strong>Focus Timer</strong><span>Pomodoro mode</span></span></button>
+          <button class="nav-item" data-nav="challenges"><span class="nav-icon">CH</span><span class="nav-label"><strong>Challenges</strong><span>Bonus quests</span></span></button>
+          <button class="nav-item" data-nav="insights"><span class="nav-icon">IN</span><span class="nav-label"><strong>Insights</strong><span>Study patterns</span></span></button>
+          <button class="nav-item" data-nav="leaderboard"><span class="nav-icon">LB</span><span class="nav-label"><strong>Leaderboard</strong><span>Class ranking</span></span></button>
+        </nav>
 
-<div id="habitList"></div>
+        <div class="sidebar-footer">
+          <strong>Minimal view</strong>
+          <div class="collapse-copy">Toggle the sidebar for a compact dashboard.</div>
+        </div>
+      </aside>
 
-<button onclick="resetAll()" style="background:gray;">Reset All</button>
+      <section class="content">
+        <section class="hero">
+          <article class="metric"><small>Current Level</small><strong id="levelValue">04</strong><div class="sub">Avatar evolves with XP</div></article>
+          <article class="metric"><small>XP Earned</small><strong><span id="xpValue">64</span>/100</strong><div class="sub">Next level in progress</div></article>
+          <article class="metric"><small>Tasks Done</small><strong id="doneValue">3</strong><div class="sub">Checklist momentum</div></article>
+          <article class="metric"><small>Focus Sessions</small><strong id="sessionValue">08</strong><div class="sub">Today&apos;s Pomodoro count</div></article>
+        </section>
 
-<script>
-let data = JSON.parse(localStorage.getItem("data")) || {
-  habits: [],
-  xp: 0,
-  level: 1
-};
+        <section class="grid-2 equal">
+          <article class="panel" id="tasksPanel">
+            <div class="panel-header">
+              <div>
+                <h2>Tasks Panel</h2>
+                <p>Animated checkmarks, XP bar, and quick task capture.</p>
+              </div>
+              <div class="panel-actions">
+                <button class="chip active">Today</button>
+                <button class="chip">This Week</button>
+              </div>
+            </div>
 
-function save() {
-  localStorage.setItem("data", JSON.stringify(data));
-}
+            <div class="task-tools">
+              <div class="row">
+                <input id="taskInput" placeholder="Add a study task" />
+                <button class="cta" id="addTaskBtn">Add Task</button>
+              </div>
+              <div class="task-list" id="taskList"></div>
+            </div>
 
-function render() {
-  let list = document.getElementById("habitList");
-  list.innerHTML = "";
+            <div class="bar-shell">
+              <div class="bar-meta"><span>XP bar</span><span id="xpLabel">64/100</span></div>
+              <div class="bar"><span id="xpBar"></span></div>
+            </div>
+          </article>
 
-  document.getElementById("stats").innerHTML =
-    "Level: " + data.level + " | XP: " + data.xp + "/100";
+          <article class="panel" id="timerPanel">
+            <div class="panel-header">
+              <div>
+                <h2>Focus Timer</h2>
+                <p>Pomodoro countdown ring with smooth start and stop transitions.</p>
+              </div>
+              <div class="panel-actions">
+                <button class="chip active" data-minutes="25">25m</button>
+                <button class="chip" data-minutes="15">15m</button>
+                <button class="chip" data-minutes="45">45m</button>
+              </div>
+            </div>
 
-  let percent = (data.xp / 100) * 100;
-  document.getElementById("xpBar").style.width = percent + "%";
+            <div class="timer-layout">
+              <div class="ring">
+                <svg viewBox="0 0 220 220" aria-hidden="true">
+                  <circle cx="110" cy="110" r="88" stroke="rgba(255,255,255,0.08)" stroke-width="14" fill="none"></circle>
+                  <circle id="timerRing" cx="110" cy="110" r="88" stroke="url(#timerGradient)" stroke-linecap="round" stroke-width="14" fill="none"></circle>
+                  <defs>
+                    <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#2de2e6" />
+                      <stop offset="50%" stop-color="#8d5cff" />
+                      <stop offset="100%" stop-color="#ff6b6b" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="timebox">
+                  <div>
+                    <strong id="timerDisplay">25:00</strong>
+                    <span id="timerState">Ready to focus</span>
+                  </div>
+                </div>
+              </div>
 
-  data.habits.forEach((habit, index) => {
-    let div = document.createElement("div");
-    div.className = "card";
+              <div class="timer-copy">
+                <div class="focus-note" id="focusNote">Smooth countdown ring, animated transitions, and reward bursts for every completed session.</div>
+                <div class="timer-controls">
+                  <button class="cta" id="timerToggle">Start Session</button>
+                  <button class="ghost" id="timerReset">Reset</button>
+                </div>
+                <div class="preset-row">
+                  <button class="ghost">No distractions</button>
+                  <button class="ghost">Deep work</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
 
-    div.innerHTML = `
-      <h3>✨ ${habit.name}</h3>
-      <p>Streak: 🔥 ${habit.streak}</p>
-      <button onclick="completeHabit(${index})">Complete</button>
-      <button class="delete-btn" onclick="deleteHabit(${index})">Delete</button>
-    `;
+        <section class="panel" id="progressPanel">
+          <div class="panel-header">
+            <div>
+              <h2>Progress and Streaks</h2>
+              <p>Fire trail energy, level-up motion, and an evolving avatar stage.</p>
+            </div>
+            <div class="panel-actions">
+              <button class="chip active">Momentum</button>
+              <button class="chip">Rewards</button>
+            </div>
+          </div>
 
-    list.appendChild(div);
-  });
-}
+          <div class="progress-hero">
+            <div class="progress-copy">
+              <div class="bar-shell">
+                <div class="bar-meta"><span>XP progress</span><span id="progressLabel">64%</span></div>
+                <div class="bar"><span id="progressBar"></span></div>
+              </div>
+              <div class="quote" id="quoteBox">"Small wins compound into big results. Finish the next task."</div>
+            </div>
 
-function addHabit() {
-  let input = document.getElementById("habitInput");
+            <div class="avatar-stage">
+              <div class="avatar-big" id="bigAvatar">L4</div>
+              <strong id="levelText">Level 4</strong>
+              <div class="level-banner" id="levelBanner">Confetti unlocks on level-up.</div>
+            </div>
+          </div>
+        </section>
 
-  if (input.value.trim() === "") return;
+        <section class="grid-2 equal">
+          <article class="panel" id="insightsPanel">
+            <div class="panel-header">
+              <div>
+                <h2>Insights Panel</h2>
+                <p>Animated study hours, streaks, and XP growth snapshots.</p>
+              </div>
+            </div>
+            <div class="insights-tabs">
+              <button class="tab active" data-view="hours">Study Hours</button>
+              <button class="tab" data-view="streaks">Streaks</button>
+              <button class="tab" data-view="xp">XP Growth</button>
+            </div>
+            <div class="chart-wrap">
+              <div class="chart" id="chart"></div>
+              <div class="leader-note" id="chartNote">Weekly study hours are trending upward.</div>
+            </div>
+          </article>
 
-  data.habits.push({
-    name: input.value,
-    streak: 0
-  });
+          <article class="panel" id="leaderboardPanel">
+            <div class="panel-header">
+              <div>
+                <h2>Leaderboard Panel</h2>
+                <p>Position changes animate as rankings update.</p>
+              </div>
+            </div>
+            <div class="leaderboard" id="leaderboard"></div>
+            <div class="leader-note">Top 3 students get a highlighted glow for fast scanning.</div>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
 
-  input.value = "";
-  save();
-  render();
-}
+  <script>
+    const STORAGE_KEY = "habitquest-dashboard-v1";
+    const LEVEL_XP = 100;
+    const quotes = [
+      "Small wins compound into big results. Finish the next task.",
+      "Focus for 25 minutes now, enjoy future-you later.",
+      "Consistency beats intensity when the goal is progress.",
+      "The streak is built one completed session at a time."
+    ];
 
-function completeHabit(index) {
-  data.habits[index].streak++;
-  data.xp += 10;
+    const insights = {
+      hours: [2.5, 3.8, 4.1, 5.2, 4.6, 6.0, 6.8],
+      streaks: [4, 5, 5, 7, 8, 10, 12],
+      xp: [20, 31, 44, 56, 68, 84, 96]
+    };
 
-  if (data.xp >= 100) {
-    data.level++;
-    data.xp = 0;
-    launchConfetti();
-    alert("🔥 LEVEL UP! You reached Level " + data.level);
-  }
+    const defaultState = {
+      level: 4,
+      xp: 64,
+      streak: 12,
+      sessions: 8,
+      collapsed: false,
+      timerMinutes: 25,
+      timerRemaining: 25 * 60,
+      timerRunning: false,
+      quoteIndex: 0,
+      tasks: [
+        { title: "Review biology notes", detail: "15 min recap before dinner", completed: true },
+        { title: "Solve algebra problems", detail: "Aim for 10 focused questions", completed: true },
+        { title: "Read history chapter", detail: "Highlight key dates and events", completed: true },
+        { title: "Write reflection journal", detail: "One paragraph about progress", completed: false }
+      ],
+      leaderboard: [
+        { name: "Maya", xp: 164, streak: 18 },
+        { name: "You", xp: 164, streak: 12 },
+        { name: "Arjun", xp: 141, streak: 16 },
+        { name: "Leah", xp: 122, streak: 10 },
+        { name: "Noah", xp: 108, streak: 9 }
+      ]
+    };
 
-  save();
-  render();
-}
+    const state = loadState();
+    let timerHandle = null;
+    let quoteHandle = null;
+    let confettiHandle = null;
 
-function deleteHabit(index) {
-  data.habits.splice(index, 1);
-  save();
-  render();
-}
+    const shell = document.getElementById("shell");
+    const sidebar = document.getElementById("sidebar");
+    const taskList = document.getElementById("taskList");
+    const leaderboard = document.getElementById("leaderboard");
+    const chart = document.getElementById("chart");
+    const toast = document.getElementById("toast");
+    const confettiCanvas = document.getElementById("confettiCanvas");
+    const ctx = confettiCanvas.getContext("2d");
+    const timerRing = document.getElementById("timerRing");
+    const ringCircumference = 2 * Math.PI * 88;
 
-function resetAll() {
-  localStorage.clear();
-  location.reload();
-}
+    timerRing.style.strokeDasharray = ringCircumference;
+    timerRing.style.strokeDashoffset = ringCircumference;
 
-// 🎉 Confetti Animation
-function launchConfetti() {
-  const canvas = document.getElementById("confettiCanvas");
-  const ctx = canvas.getContext("2d");
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return { ...defaultState, ...saved, tasks: saved?.tasks ?? defaultState.tasks, leaderboard: saved?.leaderboard ?? defaultState.leaderboard };
+      } catch {
+        return structuredClone(defaultState);
+      }
+    }
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
 
-  let pieces = [];
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
 
-  for (let i = 0; i < 80; i++) {
-    pieces.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height - canvas.height,
-      size: Math.random() * 8 + 4,
-      speed: Math.random() * 3 + 2,
-      color: `hsl(${Math.random() * 360}, 100%, 50%)`
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function updateAvatar() {
+      const badge = `L${state.level}`;
+      document.getElementById("miniAvatar").textContent = badge;
+      document.getElementById("bigAvatar").textContent = badge;
+      document.getElementById("levelValue").textContent = String(state.level).padStart(2, "0");
+      document.getElementById("levelText").textContent = `Level ${state.level}`;
+      document.getElementById("levelBanner").textContent = state.level < 10 ? "Your avatar is evolving with every level." : "Elite scholar mode unlocked.";
+    }
+
+    function updateXp() {
+      const xpPercent = clamp((state.xp / LEVEL_XP) * 100, 0, 100);
+      document.getElementById("xpValue").textContent = state.xp;
+      document.getElementById("xpLabel").textContent = `${state.xp}/${LEVEL_XP}`;
+      document.getElementById("xpBar").style.width = `${xpPercent}%`;
+      document.getElementById("progressBar").style.width = `${xpPercent}%`;
+      document.getElementById("progressLabel").textContent = `${Math.round(xpPercent)}%`;
+      document.getElementById("streakValue").textContent = state.streak;
+      document.getElementById("streakPill").classList.toggle("streak-glow", state.streak > 0);
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = "";
+      state.tasks.forEach((task, index) => {
+        const row = document.createElement("div");
+        row.className = `task${task.completed ? " completed" : ""}`;
+        row.innerHTML = `
+          <button class="check" aria-label="Toggle task">${task.completed ? "✓" : ""}</button>
+          <div class="task-copy">
+            <strong>${task.title}</strong>
+            <span>${task.detail}</span>
+          </div>
+          <button>${task.completed ? "Completed" : "Complete"}</button>
+        `;
+
+        row.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", () => toggleTask(index));
+        });
+
+        taskList.appendChild(row);
+      });
+      document.getElementById("doneValue").textContent = state.tasks.filter((task) => task.completed).length;
+    }
+
+    function toggleTask(index) {
+      const task = state.tasks[index];
+      if (task.completed) {
+        showToast("Task already completed today.");
+        return;
+      }
+
+      task.completed = true;
+      state.xp += 20;
+      state.streak += 1;
+      state.sessions += 1;
+      state.leaderboard = state.leaderboard.map((player) => player.name === "You" ? { ...player, xp: player.xp + 20, streak: state.streak } : player);
+
+      while (state.xp >= LEVEL_XP) {
+        state.xp -= LEVEL_XP;
+        state.level += 1;
+        burstConfetti();
+        showToast(`Level up! You reached level ${state.level}.`);
+      }
+
+      saveState();
+      render();
+      animateQuote();
+    }
+
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const value = input.value.trim();
+      if (!value) return;
+
+      state.tasks.unshift({ title: value, detail: "New student quest", completed: false });
+      input.value = "";
+      saveState();
+      renderTasks();
+      showToast("New task added to your quest log.");
+    }
+
+    function updateTimerUI() {
+      document.getElementById("timerDisplay").textContent = formatTime(state.timerRemaining);
+      document.getElementById("timerState").textContent = state.timerRunning ? "Focus session in progress" : (state.timerRemaining === state.timerMinutes * 60 ? "Ready to focus" : "Paused");
+      const progress = 1 - (state.timerRemaining / (state.timerMinutes * 60));
+      timerRing.style.strokeDashoffset = String(ringCircumference * (1 - progress));
+      document.getElementById("timerToggle").textContent = state.timerRunning ? "Pause Session" : "Start Session";
+    }
+
+    function setTimerMinutes(minutes) {
+      state.timerMinutes = minutes;
+      state.timerRemaining = minutes * 60;
+      state.timerRunning = false;
+      saveState();
+      updateTimerUI();
+      showToast(`Timer set to ${minutes} minutes.`);
+    }
+
+    function startTimer() {
+      if (state.timerRunning) {
+        state.timerRunning = false;
+        clearInterval(timerHandle);
+        timerHandle = null;
+        saveState();
+        updateTimerUI();
+        showToast("Session paused.");
+        return;
+      }
+
+      state.timerRunning = true;
+      saveState();
+      updateTimerUI();
+      showToast("Focus session started.");
+      timerHandle = setInterval(() => {
+        state.timerRemaining -= 1;
+        if (state.timerRemaining <= 0) {
+          state.timerRemaining = 0;
+          state.timerRunning = false;
+          clearInterval(timerHandle);
+          timerHandle = null;
+          state.xp += 15;
+          state.sessions += 1;
+          burstConfetti();
+          showToast("Session complete. Bonus XP awarded.");
+          while (state.xp >= LEVEL_XP) {
+            state.xp -= LEVEL_XP;
+            state.level += 1;
+            burstConfetti();
+          }
+          saveState();
+          render();
+          updateTimerUI();
+          return;
+        }
+        saveState();
+        updateTimerUI();
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerHandle);
+      timerHandle = null;
+      state.timerRunning = false;
+      state.timerRemaining = state.timerMinutes * 60;
+      saveState();
+      updateTimerUI();
+      showToast("Timer reset.");
+    }
+
+    function animateQuote() {
+      const box = document.getElementById("quoteBox");
+      box.classList.add("fade-out");
+      clearTimeout(animateQuote._timer);
+      animateQuote._timer = setTimeout(() => {
+        state.quoteIndex = (state.quoteIndex + 1) % quotes.length;
+        box.textContent = `\"${quotes[state.quoteIndex]}\"`;
+        box.classList.remove("fade-out");
+        saveState();
+      }, 220);
+    }
+
+    function renderLeaderboard() {
+      const sorted = [...state.leaderboard].sort((a, b) => b.xp - a.xp);
+      leaderboard.innerHTML = "";
+      sorted.forEach((player, index) => {
+        const row = document.createElement("div");
+        row.className = `leader-row ${index < 3 ? "top3" : ""}`;
+        row.innerHTML = `
+          <div class="rank">${index + 1}</div>
+          <div class="leader-copy">
+            <strong>${player.name}${player.name === "You" ? " (You)" : ""}</strong>
+            <span>${player.streak}-day streak</span>
+          </div>
+          <div class="leader-score">${player.xp} XP</div>
+        `;
+        leaderboard.appendChild(row);
+      });
+      document.getElementById("sessionValue").textContent = String(state.sessions).padStart(2, "0");
+    }
+
+    function renderChart(view = "hours") {
+      const labels = view === "hours" ? ["M", "T", "W", "T", "F", "S", "S"] : view === "streaks" ? ["1", "2", "3", "4", "5", "6", "7"] : ["10", "20", "30", "40", "50", "60", "70"];
+      const values = insights[view];
+      const colors = view === "hours" ? ["#2de2e6", "#34d399", "#8d5cff", "#ff6b6b", "#b7f34c", "#ffc857", "#2de2e6"] : view === "streaks" ? ["#8d5cff", "#2de2e6", "#ff6b6b", "#ffc857", "#b7f34c", "#2de2e6", "#8d5cff"] : ["#ff6b6b", "#ffc857", "#2de2e6", "#34d399", "#8d5cff", "#b7f34c", "#ff6b6b"];
+      const max = Math.max(...values);
+      chart.innerHTML = "";
+      values.forEach((value, index) => {
+        const item = document.createElement("div");
+        item.className = "bar-item";
+        const height = `${Math.max(18, Math.round((value / max) * 140))}px`;
+        item.style.setProperty("--h", height);
+        item.style.setProperty("--color", colors[index]);
+        item.innerHTML = `<div class="fill"></div><small>${labels[index]}</small>`;
+        chart.appendChild(item);
+      });
+      document.getElementById("chartNote").textContent = view === "hours" ? "Weekly study hours are trending upward." : view === "streaks" ? "Streak consistency is becoming stronger." : "XP growth is compounding with each session.";
+    }
+
+    function render() {
+      updateAvatar();
+      updateXp();
+      renderTasks();
+      updateTimerUI();
+      renderLeaderboard();
+      renderChart(document.querySelector(".tab.active")?.dataset.view || "hours");
+      const quoteBox = document.getElementById("quoteBox");
+      quoteBox.textContent = `\"${quotes[state.quoteIndex % quotes.length]}\"`;
+      document.getElementById("streakPill").classList.toggle("streak-glow", state.streak > 0);
+      shell.classList.toggle("collapsed", state.collapsed);
+      sidebar.classList.toggle("collapsed", state.collapsed);
+    }
+
+    function resizeCanvas() {
+      const ratio = window.devicePixelRatio || 1;
+      confettiCanvas.width = Math.floor(window.innerWidth * ratio);
+      confettiCanvas.height = Math.floor(window.innerHeight * ratio);
+      confettiCanvas.style.width = `${window.innerWidth}px`;
+      confettiCanvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function burstConfetti() {
+      resizeCanvas();
+      const particles = Array.from({ length: 140 }, () => ({
+        x: window.innerWidth * (0.25 + Math.random() * 0.5),
+        y: window.innerHeight * 0.22 + Math.random() * 30,
+        vx: (Math.random() - 0.5) * 8,
+        vy: Math.random() * -9 - 4,
+        size: Math.random() * 7 + 4,
+        spin: Math.random() * 0.2 - 0.1,
+        rot: Math.random() * Math.PI,
+        color: ["#2de2e6", "#8d5cff", "#ff6b6b", "#b7f34c", "#ffc857"][Math.floor(Math.random() * 5)],
+        life: 80 + Math.random() * 40
+      }));
+
+      const gravity = 0.22;
+      clearInterval(confettiHandle);
+      confettiHandle = setInterval(() => {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        particles.forEach((p) => {
+          p.vy += gravity;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.spin;
+          p.life -= 1;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, p.life / 120);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.72);
+          ctx.restore();
+        });
+      }, 16);
+
+      setTimeout(() => {
+        clearInterval(confettiHandle);
+        confettiHandle = null;
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      }, 1800);
+    }
+
+    document.getElementById("collapseBtn").addEventListener("click", () => {
+      state.collapsed = !state.collapsed;
+      saveState();
+      render();
     });
-  }
 
-  function update() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    pieces.forEach(p => {
-      p.y += p.speed;
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
+    document.getElementById("addTaskBtn").addEventListener("click", addTask);
+    document.getElementById("taskInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") addTask();
     });
 
-    requestAnimationFrame(update);
-  }
+    document.getElementById("timerToggle").addEventListener("click", startTimer);
+    document.getElementById("timerReset").addEventListener("click", resetTimer);
 
-  update();
+    document.querySelectorAll("[data-minutes]").forEach((button) => {
+      button.addEventListener("click", () => setTimerMinutes(Number(button.dataset.minutes)));
+    });
 
-  setTimeout(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }, 2000);
-}
+    document.querySelectorAll(".nav-item").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        const panel = document.getElementById(`${button.dataset.nav}Panel`);
+        if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
 
-render();
-</script>
+    document.querySelectorAll(".tab").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
+        button.classList.add("active");
+        renderChart(button.dataset.view);
+      });
+    });
 
+    document.getElementById("settingsBtn").addEventListener("click", () => showToast("Settings wireframe action."));
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    render();
+    quoteHandle = setInterval(animateQuote, 6500);
+  </script>
 </body>
 </html>
