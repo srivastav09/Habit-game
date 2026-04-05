@@ -1846,12 +1846,15 @@
       try {
         await refreshLeaderboardFromApi();
         if (state.currentStudentId) {
-          const sr = await fetch("/api/students/" + encodeURIComponent(state.currentStudentId));
-          if (sr.ok) {
-            const { student } = await sr.json();
-            applyServerStudentToState(student);
-          } else {
-            state.currentStudentId = null;
+          const pushedOk = await syncStudentToServerNow();
+          if (pushedOk) {
+            const sr = await fetch("/api/students/" + encodeURIComponent(state.currentStudentId));
+            if (sr.ok) {
+              const { student } = await sr.json();
+              applyServerStudentToState(student);
+            } else {
+              state.currentStudentId = null;
+            }
           }
         }
         render();
@@ -2233,6 +2236,31 @@
           }
         })();
       }, 400);
+    }
+
+    /** Clears debounced sync and PUTs current state so server matches local (fixes reset/refresh races). */
+    async function syncStudentToServerNow() {
+      if (!useBackend || !state.currentStudentId) return true;
+      clearTimeout(saveState._apiTimer);
+      saveState._apiTimer = null;
+      try {
+        syncCurrentStudent();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (_) {}
+      try {
+        const payload = buildStudentPayload();
+        if (!payload) return true;
+        const r = await fetch(`/api/students/${encodeURIComponent(state.currentStudentId)}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (r.ok) await refreshLeaderboardFromApi();
+        return r.ok;
+      } catch (e) {
+        console.warn("Immediate API sync failed", e);
+        return false;
+      }
     }
 
     window.addEventListener("beforeunload", () => {
@@ -2818,6 +2846,7 @@
       saveState();
       updateTimerUI();
       showToast(toastFmt("toastTimerReset"));
+      void syncStudentToServerNow();
     }
 
     function animateQuote() {
@@ -2993,7 +3022,10 @@
       applyCustomization();
       render();
       setQuoteLoop();
-      if (saveToStorage) saveState();
+      if (saveToStorage) {
+        saveState();
+        void syncStudentToServerNow();
+      }
     }
 
     document.getElementById("collapseBtn").addEventListener("click", () => {
@@ -3059,6 +3091,7 @@
       setQuoteLoop();
       saveState();
       showToast(toastFmt("toastDefaultsRestored"));
+      void syncStudentToServerNow();
     });
 
     function resetTasksList() {
@@ -3068,6 +3101,7 @@
       saveState();
       render();
       showToast("Tasks reset.");
+      void syncStudentToServerNow();
     }
 
     function resetAllData() {
